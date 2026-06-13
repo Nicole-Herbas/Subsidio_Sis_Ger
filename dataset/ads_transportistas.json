@@ -1,0 +1,56 @@
+{
+	"name": "ads_transportistas",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_datalake_subsidio",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "bronze/Agencia Distribuidora Sedem"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "transportistas.csv",
+				"folderPath": "agendissedem",
+				"fileSystem": "raw"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "transportista_id",
+				"type": "String"
+			},
+			{
+				"name": "razon_social",
+				"type": "String"
+			},
+			{
+				"name": "nit",
+				"type": "String"
+			},
+			{
+				"name": "municipio",
+				"type": "String"
+			},
+			{
+				"name": "contacto",
+				"type": "String"
+			},
+			{
+				"name": "telefono",
+				"type": "String"
+			},
+			{
+				"name": "estado",
+				"type": "String"
+			}
+		]
+	}
+}
