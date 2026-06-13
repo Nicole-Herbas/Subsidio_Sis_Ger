@@ -1,0 +1,10 @@
+{
+	"name": "ls_datalake_subsidio",
+	"properties": {
+		"annotations": [],
+		"type": "AzureBlobFS",
+		"typeProperties": {
+			"url": "https://stsubsidiobol14263600.dfs.core.windows.net/"
+		}
+	}
+}
