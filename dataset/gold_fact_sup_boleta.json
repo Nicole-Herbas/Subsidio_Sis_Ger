@@ -1,0 +1,53 @@
+{
+	"name": "gold_fact_sup_boleta",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "db_subsidio",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "gold"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "boleta_sup_sk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "boleta_id_src",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "control_id_src",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "persona_sk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "fecha_emision_sk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "nro_boleta",
+				"type": "varchar"
+			},
+			{
+				"name": "estado",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "gold",
+			"table": "fact_sup_boleta"
+		}
+	}
+}

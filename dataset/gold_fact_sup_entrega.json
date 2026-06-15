@@ -1,0 +1,69 @@
+{
+	"name": "gold_fact_sup_entrega",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "db_subsidio",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "gold"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "entrega_sup_sk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "entrega_id_src",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "boleta_id_src",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "persona_sk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "establecimiento_sk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "paquete_sk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "fecha_entrega_sk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "nro_lote",
+				"type": "varchar"
+			},
+			{
+				"name": "empresa_lote",
+				"type": "varchar"
+			},
+			{
+				"name": "peso_paquete_kg",
+				"type": "decimal",
+				"precision": 6,
+				"scale": 2
+			}
+		],
+		"typeProperties": {
+			"schema": "gold",
+			"table": "fact_sup_entrega"
+		}
+	}
+}

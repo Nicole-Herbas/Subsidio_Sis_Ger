@@ -1,0 +1,54 @@
+{
+	"name": "gold_fact_bja_inscripcion",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "db_subsidio",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "gold"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "inscripcion_bja_sk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "inscripcion_id_src",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "persona_sk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "establecimiento_sk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "fecha_inscripcion_sk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "semana_gestacion",
+				"type": "tinyint",
+				"precision": 3
+			},
+			{
+				"name": "estado",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "gold",
+			"table": "fact_bja_inscripcion"
+		}
+	}
+}
