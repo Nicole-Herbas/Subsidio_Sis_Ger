@@ -1,0 +1,76 @@
+{
+	"name": "gold_dim_fecha",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "db_subsidio",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "gold"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "fecha_sk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "fecha",
+				"type": "date"
+			},
+			{
+				"name": "anio",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "semestre",
+				"type": "tinyint",
+				"precision": 3
+			},
+			{
+				"name": "trimestre",
+				"type": "tinyint",
+				"precision": 3
+			},
+			{
+				"name": "mes",
+				"type": "tinyint",
+				"precision": 3
+			},
+			{
+				"name": "nombre_mes",
+				"type": "varchar"
+			},
+			{
+				"name": "semana_anio",
+				"type": "tinyint",
+				"precision": 3
+			},
+			{
+				"name": "dia_mes",
+				"type": "tinyint",
+				"precision": 3
+			},
+			{
+				"name": "dia_semana",
+				"type": "tinyint",
+				"precision": 3
+			},
+			{
+				"name": "nombre_dia",
+				"type": "varchar"
+			},
+			{
+				"name": "es_fin_semana",
+				"type": "bit"
+			}
+		],
+		"typeProperties": {
+			"schema": "gold",
+			"table": "dim_fecha"
+		}
+	}
+}
