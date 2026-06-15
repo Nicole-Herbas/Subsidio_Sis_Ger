@@ -1,0 +1,93 @@
+{
+	"name": "df_silver_bja_limpieza_datos",
+	"properties": {
+		"folder": {
+			"name": "silver"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "bronze_bja_controles_pediatricos",
+						"type": "DatasetReference"
+					},
+					"name": "ControlesPedriaticos"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "silver_bja_controles_pediatricos",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "ConversionTipoDatos"
+				},
+				{
+					"name": "Normalizacion"
+				},
+				{
+					"name": "ci"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          control_pediatrico_id as string,",
+				"          ci_nino as string,",
+				"          ci_madre as string,",
+				"          establecimiento_id as string,",
+				"          nro_control as string,",
+				"          fecha_control as string,",
+				"          peso_nino_kg as string,",
+				"          talla_nino_cm as string,",
+				"          vacuna_aplicada as string,",
+				"          resultado as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'SELECT\\r\\n    control_pediatrico_id,\\r\\n    TRIM(ci_nino)                              AS ci_nino,\\r\\n    TRIM(ci_madre)                             AS ci_madre,\\r\\n    establecimiento_id,\\r\\n    nro_control,\\r\\n    TRIM(fecha_control)                        AS fecha_control,\\r\\n    peso_nino_kg,\\r\\n    talla_nino_cm,\\r\\n    NULLIF(TRIM(vacuna_aplicada), \\'\\')         AS vacuna_aplicada,\\r\\n    NULLIF(TRIM(resultado), \\'\\')               AS resultado\\r\\nFROM bronze.bja_controles_pediatricos\\r\\nWHERE NULLIF(TRIM(ci_nino), \\'\\') IS NOT NULL',",
+				"     format: 'query') ~> ControlesPedriaticos",
+				"ControlesPedriaticos derive(fecha_control = toDate(fecha_control, 'yyyy-MM-dd'),",
+				"          peso_nino_kg = toDecimal(peso_nino_kg, 10, 2),",
+				"          talla_nino_cm =  toDecimal(talla_nino_cm, 10, 2),",
+				"          control_pediatrico_id = toInteger(control_pediatrico_id),",
+				"          establecimiento_id = toInteger(establecimiento_id),",
+				"          nro_control = toInteger(nro_control)) ~> ConversionTipoDatos",
+				"ConversionTipoDatos derive(ci_nino = replace(replace(upper(trim(ci_nino)), '-', ''), ' ', ''),",
+				"          ci_madre = replace(replace(upper(trim(ci_madre)), '-', ''), ' ', ''),",
+				"          vacuna_aplicada = initCap(lower(   regexReplace(     regexReplace(       regexReplace(         regexReplace(           trim(vacuna_aplicada),         '(?i)penttavalente', 'pentavalente'),       '(?i)doiss', 'dosis'),     '(?i)\\\\b1ar\\\\b', '1ra'),   '(?i)antipolio', 'Antipolio') )),",
+				"          resultado = initCap(lower(   iif(regexMatch(lower(trim(resultado)), 'desnutrii.+leve'), 'desnutrición leve',   iif(lower(trim(resultado)) == 'norml', 'normal',   trim(resultado))) ))) ~> Normalizacion",
+				"Normalizacion derive(ci_nino = iif(regexMatch(ci_nino, '.*[A-Za-z]+$'), ci_nino, toString(null())),",
+				"          ci_madre = iif(regexMatch(ci_madre, '.*[A-Za-z]+$'), ci_nino, toString(null()))) ~> ci",
+				"ci sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          control_pediatrico_id as integer,",
+				"          ci_nino as string,",
+				"          ci_madre as string,",
+				"          establecimiento_id as integer,",
+				"          nro_control as integer,",
+				"          fecha_control as date,",
+				"          peso_nino_kg as decimal(5,2),",
+				"          talla_nino_cm as decimal(5,1),",
+				"          vacuna_aplicada as string,",
+				"          resultado as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
+			]
+		}
+	}
+}
