@@ -27,48 +27,9 @@
 				}
 			},
 			{
-				"name": "df_bja",
-				"type": "ExecuteDataFlow",
-				"dependsOn": [
-					{
-						"activity": "df_segip",
-						"dependencyConditions": [
-							"Completed",
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"dataflow": {
-						"referenceName": "df_bronze_bja_cargar_datos",
-						"type": "DataFlowReference"
-					},
-					"compute": {
-						"coreCount": 8,
-						"computeType": "General"
-					},
-					"traceLevel": "Fine"
-				}
-			},
-			{
 				"name": "df_sup",
 				"type": "ExecuteDataFlow",
-				"dependsOn": [
-					{
-						"activity": "df_bja",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -90,16 +51,33 @@
 				}
 			},
 			{
+				"name": "df_sedem",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_bronze_sedem_cargar_datos",
+						"type": "DataFlowReference"
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
 				"name": "df_ads",
 				"type": "ExecuteDataFlow",
-				"dependsOn": [
-					{
-						"activity": "df_sup",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -121,16 +99,9 @@
 				}
 			},
 			{
-				"name": "df_sedem",
+				"name": "df_bja",
 				"type": "ExecuteDataFlow",
-				"dependsOn": [
-					{
-						"activity": "df_ads",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -141,7 +112,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataflow": {
-						"referenceName": "df_bronze_sedem_cargar_datos",
+						"referenceName": "df_bronze_bja_cargar_datos",
 						"type": "DataFlowReference"
 					},
 					"compute": {
