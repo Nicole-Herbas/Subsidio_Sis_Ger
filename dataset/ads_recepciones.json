@@ -6,7 +6,7 @@
 			"type": "LinkedServiceReference"
 		},
 		"folder": {
-			"name": "bronze/Agencia Distribuidora Sedem"
+			"name": "raw/Agencia Distribuidora Sedem"
 		},
 		"annotations": [],
 		"type": "DelimitedText",

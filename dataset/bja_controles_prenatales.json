@@ -6,7 +6,7 @@
 			"type": "LinkedServiceReference"
 		},
 		"folder": {
-			"name": "bronze/bja"
+			"name": "raw/bja"
 		},
 		"annotations": [],
 		"type": "DelimitedText",

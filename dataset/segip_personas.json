@@ -6,7 +6,7 @@
 			"type": "LinkedServiceReference"
 		},
 		"folder": {
-			"name": "bronze/segip"
+			"name": "raw/segip"
 		},
 		"annotations": [],
 		"type": "DelimitedText",
