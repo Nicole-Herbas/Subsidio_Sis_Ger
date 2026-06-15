@@ -13,6 +13,20 @@
 						"type": "DatasetReference"
 					},
 					"name": "ControlesPedriaticos"
+				},
+				{
+					"dataset": {
+						"referenceName": "bronze_bja_controles_prenatales",
+						"type": "DatasetReference"
+					},
+					"name": "ControlesPrenatales"
+				},
+				{
+					"dataset": {
+						"referenceName": "bronze_bja_establecimientos_salud",
+						"type": "DatasetReference"
+					},
+					"name": "EstablecimientosSalud"
 				}
 			],
 			"sinks": [
@@ -22,6 +36,13 @@
 						"type": "DatasetReference"
 					},
 					"name": "sink1"
+				},
+				{
+					"dataset": {
+						"referenceName": "silver_bja_controles_prenatales",
+						"type": "DatasetReference"
+					},
+					"name": "sink2"
 				}
 			],
 			"transformations": [
@@ -33,6 +54,24 @@
 				},
 				{
 					"name": "ci"
+				},
+				{
+					"name": "ConerisonTIpoDatoss"
+				},
+				{
+					"name": "Normalizar"
+				},
+				{
+					"name": "presiones"
+				},
+				{
+					"name": "TipoDatos"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "derivedColumn2"
 				}
 			],
 			"scriptLines": [
@@ -53,6 +92,38 @@
 				"     isolationLevel: 'READ_UNCOMMITTED',",
 				"     query: 'SELECT\\r\\n    control_pediatrico_id,\\r\\n    TRIM(ci_nino)                              AS ci_nino,\\r\\n    TRIM(ci_madre)                             AS ci_madre,\\r\\n    establecimiento_id,\\r\\n    nro_control,\\r\\n    TRIM(fecha_control)                        AS fecha_control,\\r\\n    peso_nino_kg,\\r\\n    talla_nino_cm,\\r\\n    NULLIF(TRIM(vacuna_aplicada), \\'\\')         AS vacuna_aplicada,\\r\\n    NULLIF(TRIM(resultado), \\'\\')               AS resultado\\r\\nFROM bronze.bja_controles_pediatricos\\r\\nWHERE NULLIF(TRIM(ci_nino), \\'\\') IS NOT NULL',",
 				"     format: 'query') ~> ControlesPedriaticos",
+				"source(output(",
+				"          control_prenatal_id as string,",
+				"          ci_beneficiaria as string,",
+				"          establecimiento_id as string,",
+				"          nro_control as string,",
+				"          fecha_control as string,",
+				"          semana_gestacion as string,",
+				"          peso_madre_kg as string,",
+				"          presion_arterial as string,",
+				"          resultado as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'SELECT\\r\\n    control_prenatal_id,\\r\\n    TRIM(ci_beneficiaria)                       AS ci_beneficiaria,\\r\\n    establecimiento_id,\\r\\n    nro_control,\\r\\n    TRIM(fecha_control)                         AS fecha_control,\\r\\n    semana_gestacion,\\r\\n    peso_madre_kg,\\r\\n    NULLIF(TRIM(presion_arterial), \\'\\')         AS presion_arterial,\\r\\n    NULLIF(TRIM(resultado), \\'\\')                AS resultado\\r\\nFROM bronze.bja_controles_prenatales\\r\\nWHERE NULLIF(TRIM(ci_beneficiaria), \\'\\') IS NOT NULL',",
+				"     format: 'query') ~> ControlesPrenatales",
+				"source(output(",
+				"          establecimiento_id as string,",
+				"          codigo_snis as string,",
+				"          nombre as string,",
+				"          tipo as string,",
+				"          nivel_atencion as string,",
+				"          municipio as string,",
+				"          departamento as string,",
+				"          red_salud as string,",
+				"          estado as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'SELECT\\r\\n    establecimiento_id,\\r\\n    TRIM(codigo_snis)                          AS codigo_snis,\\r\\n    TRIM(nombre)                               AS nombre,\\r\\n    TRIM(tipo)                                 AS tipo,\\r\\n    TRIM(nivel_atencion)                       AS nivel_atencion,\\r\\n    TRIM(municipio)                            AS municipio,\\r\\n    TRIM(departamento)                         AS departamento,\\r\\n    NULLIF(TRIM(red_salud), \\'\\')               AS red_salud,\\r\\n    TRIM(estado)                              AS estado\\r\\nFROM bronze.bja_establecimientos_salud\\r\\nWHERE NULLIF(TRIM(codigo_snis), \\'\\') IS NOT NULL',",
+				"     format: 'query') ~> EstablecimientosSalud",
 				"ControlesPedriaticos derive(fecha_control = toDate(fecha_control, 'yyyy-MM-dd'),",
 				"          peso_nino_kg = toDecimal(peso_nino_kg, 10, 2),",
 				"          talla_nino_cm =  toDecimal(talla_nino_cm, 10, 2),",
@@ -65,6 +136,40 @@
 				"          resultado = initCap(lower(   iif(regexMatch(lower(trim(resultado)), 'desnutrii.+leve'), 'desnutrición leve',   iif(lower(trim(resultado)) == 'norml', 'normal',   trim(resultado))) ))) ~> Normalizacion",
 				"Normalizacion derive(ci_nino = iif(regexMatch(ci_nino, '.*[A-Za-z]+$'), ci_nino, toString(null())),",
 				"          ci_madre = iif(regexMatch(ci_madre, '.*[A-Za-z]+$'), ci_nino, toString(null()))) ~> ci",
+				"ControlesPrenatales derive(fecha_control = iif(isNull(fecha_control), toDate(null()),\r",
+				"iif(regexMatch(toString(fecha_control), '[0-9]{2}/[0-9]{2}/[0-9]{4}'),\r",
+				"    toDate(replace(toString(fecha_control), '/', '-'), 'MM-dd-yyyy'),\r",
+				"    toDate(toString(fecha_control), 'yyyy-MM-dd')\r",
+				")),",
+				"          semana_gestacion = toInteger(semana_gestacion),",
+				"          peso_madre_kg = toDecimal(peso_madre_kg, 10, 2),",
+				"          control_prenatal_id = toInteger(control_prenatal_id),",
+				"          establecimiento_id = toInteger(establecimiento_id),",
+				"          nro_control = toInteger(nro_control)) ~> ConerisonTIpoDatoss",
+				"ConerisonTIpoDatoss derive(ci_beneficiaria = iif(regexMatch(upper(trim(ci_beneficiaria)), '[A-Z]{2}-?[0-9]+'),\r",
+				"    regexReplace(upper(trim(ci_beneficiaria)), '([A-Z]{2})-?([0-9]+)', '$2$1'),\r",
+				"iif(regexMatch(upper(trim(ci_beneficiaria)), '[0-9]+-?[A-Z]{2}'),\r",
+				"    regexReplace(replace(upper(trim(ci_beneficiaria)), '-', ''), '([0-9]+)([A-Z]{2})', '$1$2'),\r",
+				"    replace(replace(upper(trim(ci_beneficiaria)), '-', ''), ' ', '')\r",
+				")),",
+				"          resultado = initCap(lower(\r",
+				"  regexReplace(\r",
+				"    regexReplace(\r",
+				"      regexReplace(\r",
+				"        regexReplace(\r",
+				"          trim(resultado),\r",
+				"        '(?i)Noraml', 'Normal'),\r",
+				"      '(?i)Riesgoo Bajo', 'Riesgo Bajo'),\r",
+				"    '(?i)Riesgoo Alto', 'Riesgo Alto'),\r",
+				"  '(?i)Riiesgo Bajo', 'Riesgo Bajo')\r",
+				"))) ~> Normalizar",
+				"Normalizar derive(presion_sistolica = toInteger(trim(split(presion_arterial, '/')[1])),",
+				"          presion_diastolica = toInteger(trim(split(presion_arterial, '/')[2])),",
+				"          ci_beneficiaria = replace(replace(upper(trim(ci_beneficiaria)), '-', ''), ' ', '')) ~> presiones",
+				"EstablecimientosSalud derive(departamento = iif(upper(trim(departamento)) == 'LP', 'La Paz', iif(upper(trim(departamento)) == 'CB', 'Cochabamba', iif(upper(trim(departamento)) == 'SC', 'Santa Cruz', iif(upper(trim(departamento)) == 'OR', 'Oruro', trim(departamento))))),",
+				"          establecimiento_id = toInteger(establecimiento_id)) ~> TipoDatos",
+				"TipoDatos derive(departamento = iif(upper(trim(departamento)) == 'BN', 'Beni', iif(upper(trim(departamento)) == 'CH', 'Chuquisaca', iif(upper(trim(departamento)) == 'PT', 'Potosi', iif(upper(trim(departamento)) == 'TJ', 'Tarija', trim(departamento)))))) ~> derivedColumn1",
+				"derivedColumn1 derive(departamento = iif(upper(trim(departamento)) == 'LP', 'La Paz', iif(upper(trim(departamento)) == 'CB', 'Cochabamba', iif(upper(trim(departamento)) == 'PD', 'Pando', iif(upper(trim(departamento)) == 'OR', 'Oruro', trim(departamento)))))) ~> derivedColumn2",
 				"ci sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
@@ -86,7 +191,41 @@
 				"     format: 'table',",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
-				"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink1",
+				"presiones sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          control_prenatal_id as integer,",
+				"          ci_beneficiaria as string,",
+				"          establecimiento_id as integer,",
+				"          nro_control as integer,",
+				"          fecha_control as date,",
+				"          semana_gestacion as integer,",
+				"          peso_madre_kg as decimal(5,2),",
+				"          presion_sistolica as integer,",
+				"          presion_diastolica as integer,",
+				"          resultado as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          control_prenatal_id,",
+				"          ci_beneficiaria,",
+				"          establecimiento_id,",
+				"          nro_control,",
+				"          fecha_control,",
+				"          semana_gestacion,",
+				"          peso_madre_kg,",
+				"          presion_sistolica,",
+				"          presion_diastolica,",
+				"          resultado",
+				"     )) ~> sink2"
 			]
 		}
 	}
