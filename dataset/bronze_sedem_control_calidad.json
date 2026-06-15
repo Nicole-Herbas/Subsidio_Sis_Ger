@@ -1,0 +1,68 @@
+{
+	"name": "bronze_sedem_control_calidad",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "db_subsidio",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "bronze/sedem"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "control_id",
+				"type": "varchar"
+			},
+			{
+				"name": "produccion_id",
+				"type": "varchar"
+			},
+			{
+				"name": "nro_lote",
+				"type": "varchar"
+			},
+			{
+				"name": "nro_control",
+				"type": "varchar"
+			},
+			{
+				"name": "fecha_control",
+				"type": "varchar"
+			},
+			{
+				"name": "parametro",
+				"type": "varchar"
+			},
+			{
+				"name": "valor_medido",
+				"type": "varchar"
+			},
+			{
+				"name": "unidad_medida",
+				"type": "varchar"
+			},
+			{
+				"name": "valor_minimo",
+				"type": "varchar"
+			},
+			{
+				"name": "valor_maximo",
+				"type": "varchar"
+			},
+			{
+				"name": "cumple",
+				"type": "varchar"
+			},
+			{
+				"name": "inspector",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "bronze",
+			"table": "sedem_control_calidad"
+		}
+	}
+}

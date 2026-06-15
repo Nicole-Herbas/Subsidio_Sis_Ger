@@ -1,0 +1,60 @@
+{
+	"name": "bronze_sedem_inventario",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "db_subsidio",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "bronze/sedem"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "inventario_id",
+				"type": "varchar"
+			},
+			{
+				"name": "empresa_id",
+				"type": "varchar"
+			},
+			{
+				"name": "producto_id",
+				"type": "varchar"
+			},
+			{
+				"name": "nro_lote",
+				"type": "varchar"
+			},
+			{
+				"name": "cantidad_producida",
+				"type": "varchar"
+			},
+			{
+				"name": "cantidad_despachada",
+				"type": "varchar"
+			},
+			{
+				"name": "cantidad_disponible",
+				"type": "varchar"
+			},
+			{
+				"name": "estado",
+				"type": "varchar"
+			},
+			{
+				"name": "fecha_ultimo_movimiento",
+				"type": "varchar"
+			},
+			{
+				"name": "almacen",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "bronze",
+			"table": "sedem_inventario"
+		}
+	}
+}
