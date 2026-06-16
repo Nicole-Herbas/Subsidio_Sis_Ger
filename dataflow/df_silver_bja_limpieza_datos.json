@@ -27,6 +27,27 @@
 						"type": "DatasetReference"
 					},
 					"name": "EstablecimientosSalud"
+				},
+				{
+					"dataset": {
+						"referenceName": "bronze_bja_inscripciones",
+						"type": "DatasetReference"
+					},
+					"name": "Inscripciones"
+				},
+				{
+					"dataset": {
+						"referenceName": "bronze_bja_pagos",
+						"type": "DatasetReference"
+					},
+					"name": "Pagos"
+				},
+				{
+					"dataset": {
+						"referenceName": "bronze_bja_partos",
+						"type": "DatasetReference"
+					},
+					"name": "Partos"
 				}
 			],
 			"sinks": [
@@ -43,6 +64,34 @@
 						"type": "DatasetReference"
 					},
 					"name": "sink2"
+				},
+				{
+					"dataset": {
+						"referenceName": "silver_bja_establecimientos_salud",
+						"type": "DatasetReference"
+					},
+					"name": "sink3"
+				},
+				{
+					"dataset": {
+						"referenceName": "silver_bja_inscripciones",
+						"type": "DatasetReference"
+					},
+					"name": "sink4"
+				},
+				{
+					"dataset": {
+						"referenceName": "silver_bja_pagos",
+						"type": "DatasetReference"
+					},
+					"name": "sink5"
+				},
+				{
+					"dataset": {
+						"referenceName": "silver_bja_partos",
+						"type": "DatasetReference"
+					},
+					"name": "sink6"
 				}
 			],
 			"transformations": [
@@ -68,10 +117,22 @@
 					"name": "TipoDatos"
 				},
 				{
-					"name": "derivedColumn1"
+					"name": "dep"
 				},
 				{
-					"name": "derivedColumn2"
+					"name": "deptos"
+				},
+				{
+					"name": "tipes"
+				},
+				{
+					"name": "todo"
+				},
+				{
+					"name": "c"
+				},
+				{
+					"name": "limpio"
 				}
 			],
 			"scriptLines": [
@@ -124,6 +185,49 @@
 				"     isolationLevel: 'READ_UNCOMMITTED',",
 				"     query: 'SELECT\\r\\n    establecimiento_id,\\r\\n    TRIM(codigo_snis)                          AS codigo_snis,\\r\\n    TRIM(nombre)                               AS nombre,\\r\\n    TRIM(tipo)                                 AS tipo,\\r\\n    TRIM(nivel_atencion)                       AS nivel_atencion,\\r\\n    TRIM(municipio)                            AS municipio,\\r\\n    TRIM(departamento)                         AS departamento,\\r\\n    NULLIF(TRIM(red_salud), \\'\\')               AS red_salud,\\r\\n    TRIM(estado)                              AS estado\\r\\nFROM bronze.bja_establecimientos_salud\\r\\nWHERE NULLIF(TRIM(codigo_snis), \\'\\') IS NOT NULL',",
 				"     format: 'query') ~> EstablecimientosSalud",
+				"source(output(",
+				"          inscripcion_id as string,",
+				"          ci_beneficiaria as string,",
+				"          establecimiento_id as string,",
+				"          fecha_inscripcion as string,",
+				"          semana_gestacion as string,",
+				"          estado as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'SELECT\\r\\n    inscripcion_id,\\r\\n    TRIM(ci_beneficiaria)                       AS ci_beneficiaria,\\r\\n    establecimiento_id,\\r\\n    TRIM(fecha_inscripcion)                     AS fecha_inscripcion,\\r\\n    semana_gestacion,\\r\\n    LOWER(TRIM(estado))               AS estado\\r\\nFROM bronze.bja_inscripciones\\r\\nWHERE NULLIF(TRIM(ci_beneficiaria), \\'\\') IS NOT NULL',",
+				"     format: 'query') ~> Inscripciones",
+				"source(output(",
+				"          pago_id as string,",
+				"          ci_beneficiaria as string,",
+				"          concepto_pago as string,",
+				"          monto_bs as string,",
+				"          fecha_pago as string,",
+				"          estado_pago as string,",
+				"          canal_pago as string,",
+				"          nro_comprobante as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'SELECT\\r\\n    pago_id,\\r\\n    TRIM(ci_beneficiaria)                      AS ci_beneficiaria,\\r\\n    TRIM(concepto_pago)                        AS concepto_pago,\\r\\n    monto_bs,\\r\\n    TRIM(fecha_pago)                           AS fecha_pago,\\r\\n    TRIM(estado_pago)                        AS estado_pago,\\r\\n    NULLIF(TRIM(canal_pago), \\'\\')              AS canal_pago,\\r\\n    NULLIF(TRIM(nro_comprobante), \\'\\')         AS nro_comprobante\\r\\nFROM bronze.bja_pagos\\r\\nWHERE NULLIF(TRIM(ci_beneficiaria), \\'\\') IS NOT NULL',",
+				"     format: 'query') ~> Pagos",
+				"source(output(",
+				"          parto_id as string,",
+				"          ci_madre as string,",
+				"          ci_recien_nacido as string,",
+				"          establecimiento_id as string,",
+				"          fecha_parto as string,",
+				"          tipo_parto as string,",
+				"          peso_nacimiento_kg as string,",
+				"          talla_nacimiento_cm as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'SELECT\\r\\n    parto_id,\\r\\n    TRIM(ci_madre)                             AS ci_madre,\\r\\n    TRIM(ci_recien_nacido)                     AS ci_recien_nacido,\\r\\n    establecimiento_id,\\r\\n    TRIM(fecha_parto)                          AS fecha_parto,\\r\\n    LOWER(TRIM(tipo_parto))                                        AS tipo_parto,\\r\\n    peso_nacimiento_kg                           AS peso_nacimiento_kg,\\r\\n    talla_nacimiento_cm\\r\\nFROM bronze.bja_partos\\r\\nWHERE NULLIF(TRIM(ci_madre), \\'\\') IS NOT NULL',",
+				"     format: 'query') ~> Partos",
 				"ControlesPedriaticos derive(fecha_control = toDate(fecha_control, 'yyyy-MM-dd'),",
 				"          peso_nino_kg = toDecimal(peso_nino_kg, 10, 2),",
 				"          talla_nino_cm =  toDecimal(talla_nino_cm, 10, 2),",
@@ -168,8 +272,51 @@
 				"          ci_beneficiaria = replace(replace(upper(trim(ci_beneficiaria)), '-', ''), ' ', '')) ~> presiones",
 				"EstablecimientosSalud derive(departamento = iif(upper(trim(departamento)) == 'LP', 'La Paz', iif(upper(trim(departamento)) == 'CB', 'Cochabamba', iif(upper(trim(departamento)) == 'SC', 'Santa Cruz', iif(upper(trim(departamento)) == 'OR', 'Oruro', trim(departamento))))),",
 				"          establecimiento_id = toInteger(establecimiento_id)) ~> TipoDatos",
-				"TipoDatos derive(departamento = iif(upper(trim(departamento)) == 'BN', 'Beni', iif(upper(trim(departamento)) == 'CH', 'Chuquisaca', iif(upper(trim(departamento)) == 'PT', 'Potosi', iif(upper(trim(departamento)) == 'TJ', 'Tarija', trim(departamento)))))) ~> derivedColumn1",
-				"derivedColumn1 derive(departamento = iif(upper(trim(departamento)) == 'LP', 'La Paz', iif(upper(trim(departamento)) == 'CB', 'Cochabamba', iif(upper(trim(departamento)) == 'PD', 'Pando', iif(upper(trim(departamento)) == 'OR', 'Oruro', trim(departamento)))))) ~> derivedColumn2",
+				"TipoDatos derive(departamento = iif(upper(trim(departamento)) == 'BN', 'Beni', iif(upper(trim(departamento)) == 'CH', 'Chuquisaca', iif(upper(trim(departamento)) == 'PT', 'Potosi', iif(upper(trim(departamento)) == 'TJ', 'Tarija', trim(departamento)))))) ~> dep",
+				"dep derive(departamento = iif(upper(trim(departamento)) == 'LP', 'La Paz', iif(upper(trim(departamento)) == 'CB', 'Cochabamba', iif(upper(trim(departamento)) == 'PD', 'Pando', iif(upper(trim(departamento)) == 'OR', 'Oruro', trim(departamento)))))) ~> deptos",
+				"Inscripciones derive(fecha_inscripcion =  toDate(fecha_inscripcion, 'yyyy-MM-dd'),",
+				"          inscripcion_id = toInteger(inscripcion_id),",
+				"          semana_gestacion = toInteger(semana_gestacion),",
+				"          establecimiento_id = toInteger(semana_gestacion),",
+				"          estado = initCap(lower(trim(estado)))) ~> tipes",
+				"Pagos derive(fecha_pago = iif(isNull(fecha_pago), toDate(null()), iif(regexMatch(toString(fecha_pago), '[0-9]{2}/[0-9]{2}/[0-9]{4}'),     toDate(replace(toString(fecha_pago), '/', '-'), 'MM-dd-yyyy'),     toDate(toString(fecha_pago), 'yyyy-MM-dd') )),",
+				"          ci_beneficiaria = iif(regexMatch(upper(trim(ci_beneficiaria)), '[A-Z]{2}-?[0-9]+'),\r",
+				"    regexReplace(upper(trim(ci_beneficiaria)), '([A-Z]{2})-?([0-9]+)', '$2$1'),\r",
+				"iif(regexMatch(upper(trim(ci_beneficiaria)), '[0-9]+-?[A-Z]{2}'),\r",
+				"    regexReplace(replace(upper(trim(ci_beneficiaria)), '-', ''), '([0-9]+)([A-Z]{2})', '$1$2'),\r",
+				"    replace(replace(upper(trim(ci_beneficiaria)), '-', ''), ' ', '')\r",
+				")),",
+				"          monto_bs = toDecimal(monto_bs, 10, 2),",
+				"          estado_pago = initCap(lower(trim(estado_pago))),",
+				"          pago_id = toInteger(pago_id),",
+				"          concepto_pago = initCap(lower(trim(concepto_pago))),",
+				"          canal_pago = initCap(lower(trim(canal_pago)))) ~> todo",
+				"todo derive(ci_beneficiaria = iif(regexMatch(ci_beneficiaria, '.*[A-Za-z]+$'), ci_beneficiaria, toString(null()))) ~> c",
+				"Partos derive(fecha_parto = iif(isNull(fecha_parto) || trim(toString(fecha_parto)) == '',     toDate(null()), iif(regexMatch(trim(toString(fecha_parto)), '[0-9]{2}-[0-9]{2}-[0-9]{4}'),     toDate(trim(toString(fecha_parto)), 'dd-MM-yyyy'), iif(regexMatch(trim(toString(fecha_parto)), '[0-9]{4}-[0-9]{2}-[0-9]{2}'),     toDate(trim(toString(fecha_parto)), 'yyyy-MM-dd'), iif(regexMatch(trim(toString(fecha_parto)), '[0-9]{2}/[0-9]{2}/[0-9]{4}'),     toDate(trim(toString(fecha_parto)), 'MM/dd/yyyy'),     toDate(null()) )))),",
+				"          ci_madre = iif(regexMatch(upper(trim(ci_madre)), '[0-9]+-[A-Z]{2}'),\r",
+				"    regexReplace(upper(trim(ci_madre)), '([0-9]+)-([A-Z]{2})', '$1$2'),\r",
+				"iif(regexMatch(upper(trim(ci_madre)), '[A-Z]{2}-[0-9]+'),\r",
+				"    regexReplace(upper(trim(ci_madre)), '([A-Z]{2})-([0-9]+)', '$2$1'),\r",
+				"iif(regexMatch(upper(trim(ci_madre)), '^[A-Z]{2}[0-9]+'),\r",
+				"    regexReplace(upper(trim(ci_madre)), '([A-Z]{2})([0-9]+)', '$2$1'),\r",
+				"    replace(replace(upper(trim(ci_madre)), '-', ''), ' ', '')\r",
+				"))),",
+				"          ci_recien_nacido = iif(regexMatch(upper(trim(ci_recien_nacido)), '[0-9]+-[A-Z]{2}'),\r",
+				"    regexReplace(upper(trim(ci_recien_nacido)), '([0-9]+)-([A-Z]{2})', '$1$2'),\r",
+				"iif(regexMatch(upper(trim(ci_recien_nacido)), '[A-Z]{2}-[0-9]+'),\r",
+				"    regexReplace(upper(trim(ci_recien_nacido)), '([A-Z]{2})-([0-9]+)', '$2$1'),\r",
+				"iif(regexMatch(upper(trim(ci_recien_nacido)), '^[A-Z]{2}[0-9]+'),\r",
+				"    regexReplace(upper(trim(ci_recien_nacido)), '([A-Z]{2})([0-9]+)', '$2$1'),\r",
+				"    replace(replace(upper(trim(ci_recien_nacido)), '-', ''), ' ', '')\r",
+				"))),",
+				"          tipo_parto = iif(lower(trim(tipo_parto)) == 'natural' || startsWith(lower(trim(tipo_parto)), 'nat'), 'Natural',\r",
+				"iif(regexMatch(lower(trim(tipo_parto)), '.*ces.*'), 'Cesárea',\r",
+				"    initCap(lower(trim(tipo_parto)))\r",
+				")),",
+				"          peso_nacimiento_kg =  iif(toDecimal(peso_nacimiento_kg) > 7 || toDecimal(peso_nacimiento_kg) < 0.5, toDecimal(null()), toDecimal(peso_nacimiento_kg, 10, 3)),",
+				"          parto_id = toInteger(parto_id),",
+				"          establecimiento_id = toInteger(establecimiento_id),",
+				"          talla_nacimiento_cm =  toDecimal(talla_nacimiento_cm, 10, 2)) ~> limpio",
 				"ci sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
@@ -225,7 +372,126 @@
 				"          presion_sistolica,",
 				"          presion_diastolica,",
 				"          resultado",
-				"     )) ~> sink2"
+				"     )) ~> sink2",
+				"deptos sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          establecimiento_id as integer,",
+				"          codigo_snis as string,",
+				"          nombre as string,",
+				"          tipo as string,",
+				"          nivel_atencion as string,",
+				"          municipio as string,",
+				"          departamento as string,",
+				"          red_salud as string,",
+				"          estado as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          establecimiento_id,",
+				"          codigo_snis,",
+				"          nombre,",
+				"          tipo,",
+				"          nivel_atencion,",
+				"          municipio,",
+				"          departamento,",
+				"          red_salud,",
+				"          estado",
+				"     )) ~> sink3",
+				"tipes sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          inscripcion_id as integer,",
+				"          ci_beneficiaria as string,",
+				"          establecimiento_id as integer,",
+				"          fecha_inscripcion as date,",
+				"          semana_gestacion as integer,",
+				"          estado as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          inscripcion_id,",
+				"          ci_beneficiaria,",
+				"          establecimiento_id,",
+				"          fecha_inscripcion,",
+				"          semana_gestacion,",
+				"          estado",
+				"     )) ~> sink4",
+				"c sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          pago_id as integer,",
+				"          ci_beneficiaria as string,",
+				"          concepto_pago as string,",
+				"          tipo_evento as string,",
+				"          monto_bs as decimal(10,2),",
+				"          fecha_pago as date,",
+				"          estado_pago as string,",
+				"          canal_pago as string,",
+				"          nro_comprobante as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          pago_id,",
+				"          ci_beneficiaria,",
+				"          concepto_pago,",
+				"          monto_bs,",
+				"          fecha_pago,",
+				"          estado_pago,",
+				"          canal_pago,",
+				"          nro_comprobante",
+				"     )) ~> sink5",
+				"limpio sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          parto_id as integer,",
+				"          ci_madre as string,",
+				"          ci_recien_nacido as string,",
+				"          establecimiento_id as integer,",
+				"          fecha_parto as date,",
+				"          tipo_parto as string,",
+				"          peso_nacimiento_kg as decimal(5,3),",
+				"          talla_nacimiento_cm as decimal(5,1)",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          parto_id,",
+				"          ci_madre,",
+				"          ci_recien_nacido,",
+				"          establecimiento_id,",
+				"          fecha_parto,",
+				"          tipo_parto,",
+				"          peso_nacimiento_kg,",
+				"          talla_nacimiento_cm",
+				"     )) ~> sink6"
 			]
 		}
 	}
