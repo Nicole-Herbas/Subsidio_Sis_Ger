@@ -85,6 +85,13 @@
 						"type": "DatasetReference"
 					},
 					"name": "sink5"
+				},
+				{
+					"dataset": {
+						"referenceName": "silver_sedem_productos",
+						"type": "DatasetReference"
+					},
+					"name": "sink6"
 				}
 			],
 			"transformations": [
@@ -108,6 +115,9 @@
 				},
 				{
 					"name": "derivedColumn1"
+				},
+				{
+					"name": "derivedColumn2"
 				}
 			],
 			"scriptLines": [
@@ -268,6 +278,9 @@
 				"          cantidad = toInteger(toDecimal(trim(toString(cantidad)), 10, 2)),",
 				"          unidad = initCap(lower(trim(unidad))),",
 				"          turno = initCap(lower(trim(turno)))) ~> derivedColumn1",
+				"Productos derive(producto_id = toInteger(producto_id),",
+				"          empresa_id = toInteger(empresa_id),",
+				"          estado = initCap(lower(trim(estado)))) ~> derivedColumn2",
 				"TipoDato sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
@@ -435,7 +448,33 @@
 				"          costo_produccion,",
 				"          estado,",
 				"          fecha_vencimiento",
-				"     )) ~> sink5"
+				"     )) ~> sink5",
+				"derivedColumn2 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          producto_id as integer,",
+				"          empresa_id as integer,",
+				"          nombre as string,",
+				"          categoria as string,",
+				"          presentacion as string,",
+				"          estado as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          producto_id,",
+				"          empresa_id,",
+				"          nombre,",
+				"          categoria,",
+				"          presentacion,",
+				"          estado",
+				"     )) ~> sink6"
 			]
 		}
 	}
