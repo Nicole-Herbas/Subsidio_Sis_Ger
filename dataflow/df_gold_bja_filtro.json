@@ -6,11 +6,94 @@
 		},
 		"type": "MappingDataFlow",
 		"typeProperties": {
-			"sources": [],
-			"sinks": [],
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "silver_bja_controles_pediatricos",
+						"type": "DatasetReference"
+					},
+					"name": "ControlesPediatricos"
+				},
+				{
+					"name": "ControlesPrenatales"
+				},
+				{
+					"name": "EstablecimientosSalud"
+				},
+				{
+					"name": "Inscripciones"
+				},
+				{
+					"name": "Pagos"
+				},
+				{
+					"name": "Partos"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "gold_fact_bja_control_pediatrico",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
 			"transformations": [],
 			"scriptLines": [
-				""
+				"source(output(",
+				"          ci_beneficiaria as string,",
+				"          establecimiento_id as integer,",
+				"          nro_control as integer,",
+				"          fecha_control as date,",
+				"          semana_gestacion as integer,",
+				"          peso_madre_kg as decimal(5,2),",
+				"          presion_sistolica as short,",
+				"          presion_diastolica as short,",
+				"          resultado as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'SELECT\\r\\n    ci_beneficiaria,\\r\\n    establecimiento_id,\\r\\n    nro_control,\\r\\n    fecha_control,\\r\\n    semana_gestacion,\\r\\n    peso_madre_kg,\\r\\n    presion_sistolica,\\r\\n    presion_diastolica,\\r\\n    resultado\\r\\nFROM silver.bja_controles_prenatales',",
+				"     format: 'query') ~> ControlesPediatricos",
+				"source(allowSchemaDrift: true,",
+				"     validateSchema: false) ~> ControlesPrenatales",
+				"source(allowSchemaDrift: true,",
+				"     validateSchema: false) ~> EstablecimientosSalud",
+				"source(allowSchemaDrift: true,",
+				"     validateSchema: false) ~> Inscripciones",
+				"source(allowSchemaDrift: true,",
+				"     validateSchema: false) ~> Pagos",
+				"source(allowSchemaDrift: true,",
+				"     validateSchema: false) ~> Partos",
+				"ControlesPediatricos sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          control_ped_bja_sk as integer,",
+				"          control_ped_id_src as integer,",
+				"          persona_sk_nino as integer,",
+				"          persona_sk_madre as integer,",
+				"          establecimiento_sk as integer,",
+				"          fecha_control_sk as integer,",
+				"          nro_control as integer,",
+				"          peso_nino_kg as decimal(5,2),",
+				"          talla_nino_cm as decimal(5,1),",
+				"          vacuna_aplicada as string,",
+				"          resultado as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          nro_control,",
+				"          resultado",
+				"     )) ~> sink1"
 			]
 		}
 	}
