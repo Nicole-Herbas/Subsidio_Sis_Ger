@@ -64,6 +64,20 @@
 						"type": "DatasetReference"
 					},
 					"name": "sink3"
+				},
+				{
+					"dataset": {
+						"referenceName": "silver_agencia_transportistas",
+						"type": "DatasetReference"
+					},
+					"name": "sink4"
+				},
+				{
+					"dataset": {
+						"referenceName": "silver_agencia_vehiculos",
+						"type": "DatasetReference"
+					},
+					"name": "sink5"
 				}
 			],
 			"transformations": [
@@ -81,6 +95,12 @@
 				},
 				{
 					"name": "normal"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "derivedColumn2"
 				}
 			],
 			"scriptLines": [
@@ -150,7 +170,8 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
-				"     format: 'table') ~> Transportistas",
+				"     query: 'SELECT\\r\\n    transportista_id,\\r\\n    TRIM(razon_social)  AS razon_social,\\r\\n    TRIM(nit)           AS nit,\\r\\n    TRIM(municipio)     AS municipio,\\r\\n    TRIM(contacto)      AS contacto,\\r\\n    TRIM(telefono)      AS telefono,\\r\\n    TRIM(estado) AS estado\\r\\nFROM bronze.agencia_transportistas',",
+				"     format: 'query') ~> Transportistas",
 				"source(output(",
 				"          vehiculo_id as string,",
 				"          transportista_id as string,",
@@ -163,7 +184,8 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
-				"     format: 'table') ~> Vehiculos",
+				"     query: 'SELECT\\r\\n    vehiculo_id,\\r\\n    transportista_id,\\r\\n    TRIM(descripcion)   AS descripcion,\\r\\n    UPPER(TRIM(placa))  AS placa,\\r\\n    TRIM(tipo) AS tipo,\\r\\n    capacidad_kg,\\r\\n    TRIM(estado) AS estado\\r\\nFROM bronze.agencia_vehiculos',",
+				"     format: 'query') ~> Vehiculos",
 				"Almacenes derive(almacen_id = toInteger(almacen_id),",
 				"          capacidad_m3 = toInteger(capacidad_m3)) ~> Normalizar",
 				"Despachos derive(despacho_id = toInteger(despacho_id),",
@@ -214,7 +236,13 @@
 				"iif(regexMatch(trim(toString(fecha_recepcion)), '[0-9]{2}/[0-9]{2}/[0-9]{4}') && toInteger(left(trim(toString(fecha_recepcion)),2)) > 12,\r",
 				"    toDate(trim(toString(fecha_recepcion)), 'dd/MM/yyyy'),\r",
 				"    toDate(trim(toString(fecha_recepcion)), 'MM/dd/yyyy')\r",
-				"))))) ~> normal",
+				")))),",
+				"          responsable = initCap(lower(trim(responsable))),",
+				"          condicion = initCap(lower(trim(condicion)))) ~> normal",
+				"Transportistas derive(transportista_id = toInteger(transportista_id)) ~> derivedColumn1",
+				"Vehiculos derive(vehiculo_id = toInteger(vehiculo_id),",
+				"          transportista_id = toInteger(transportista_id),",
+				"          capacidad_kg = toInteger(capacidad_kg)) ~> derivedColumn2",
 				"Normalizar sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
@@ -300,7 +328,63 @@
 				"     format: 'table',",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
-				"     errorHandlingOption: 'stopOnFirstError') ~> sink3"
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink3",
+				"derivedColumn1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          transportista_id as integer,",
+				"          razon_social as string,",
+				"          nit as string,",
+				"          municipio as string,",
+				"          contacto as string,",
+				"          telefono as string,",
+				"          estado as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          transportista_id,",
+				"          razon_social,",
+				"          nit,",
+				"          municipio,",
+				"          contacto,",
+				"          telefono,",
+				"          estado",
+				"     )) ~> sink4",
+				"derivedColumn2 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          vehiculo_id as integer,",
+				"          transportista_id as integer,",
+				"          descripcion as string,",
+				"          placa as string,",
+				"          tipo as string,",
+				"          capacidad_kg as integer,",
+				"          estado as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          vehiculo_id,",
+				"          transportista_id,",
+				"          descripcion,",
+				"          placa,",
+				"          tipo,",
+				"          capacidad_kg,",
+				"          estado",
+				"     )) ~> sink5"
 			]
 		}
 	}
