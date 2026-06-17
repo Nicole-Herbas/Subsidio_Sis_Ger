@@ -1,0 +1,132 @@
+{
+	"name": "fact_cadena_suministro",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "db_subsidio",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "gold/tablas de hechos"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "movimiento_sk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "nro_lote",
+				"type": "varchar"
+			},
+			{
+				"name": "empresa_sk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "empresa_sigla",
+				"type": "varchar"
+			},
+			{
+				"name": "tipo_movimiento",
+				"type": "varchar"
+			},
+			{
+				"name": "fecha_sk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "producto_sk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "planta_sk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "turno",
+				"type": "varchar"
+			},
+			{
+				"name": "cantidad_producida",
+				"type": "decimal",
+				"precision": 12,
+				"scale": 2
+			},
+			{
+				"name": "unidad",
+				"type": "varchar"
+			},
+			{
+				"name": "costo_produccion",
+				"type": "decimal",
+				"precision": 14,
+				"scale": 2
+			},
+			{
+				"name": "almacen_sk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "transportista_sk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "vehiculo_sk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "cantidad_movida",
+				"type": "decimal",
+				"precision": 12,
+				"scale": 2
+			},
+			{
+				"name": "centro_destino",
+				"type": "varchar"
+			},
+			{
+				"name": "temperatura_llegada",
+				"type": "decimal",
+				"precision": 6,
+				"scale": 2
+			},
+			{
+				"name": "persona_sk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "ci_beneficiaria",
+				"type": "varchar"
+			},
+			{
+				"name": "paquete_sk",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "peso_paquete_kg",
+				"type": "decimal",
+				"precision": 6,
+				"scale": 2
+			},
+			{
+				"name": "estado",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "gold",
+			"table": "fact_cadena_suministro"
+		}
+	}
+}
