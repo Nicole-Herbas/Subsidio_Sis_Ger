@@ -1,0 +1,17 @@
+{
+	"name": "df_gold_cadena_suministro",
+	"properties": {
+		"folder": {
+			"name": "gold/tabla hechos"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [],
+			"sinks": [],
+			"transformations": [],
+			"scriptLines": [
+				""
+			]
+		}
+	}
+}
