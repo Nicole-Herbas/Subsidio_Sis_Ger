@@ -6,11 +6,125 @@
 		},
 		"type": "MappingDataFlow",
 		"typeProperties": {
-			"sources": [],
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "silver_agencia_almacenes",
+						"type": "DatasetReference"
+					},
+					"name": "almacenes"
+				},
+				{
+					"dataset": {
+						"referenceName": "silver_agencia_despachos",
+						"type": "DatasetReference"
+					},
+					"name": "despachos"
+				},
+				{
+					"dataset": {
+						"referenceName": "silver_agencia_recepciones",
+						"type": "DatasetReference"
+					},
+					"name": "recepciones"
+				},
+				{
+					"dataset": {
+						"referenceName": "silver_agencia_transportistas",
+						"type": "DatasetReference"
+					},
+					"name": "transportistas"
+				},
+				{
+					"dataset": {
+						"referenceName": "silver_agencia_vehiculos",
+						"type": "DatasetReference"
+					},
+					"name": "vehiculos"
+				}
+			],
 			"sinks": [],
 			"transformations": [],
 			"scriptLines": [
-				""
+				"source(output(",
+				"          almacen_id as integer,",
+				"          nombre as string,",
+				"          municipio as string,",
+				"          departamento as string,",
+				"          direccion as string,",
+				"          capacidad_m3 as integer,",
+				"          estado as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> almacenes",
+				"source(output(",
+				"          despacho_id as integer,",
+				"          recepcion_id as integer,",
+				"          nro_lote as string,",
+				"          almacen_id as integer,",
+				"          transportista_id as integer,",
+				"          vehiculo_id as integer,",
+				"          empresa_origen as string,",
+				"          fecha_despacho as date,",
+				"          fecha_llegada as date,",
+				"          cantidad_despachada as decimal(12,2),",
+				"          centro_destino as string,",
+				"          estado as string,",
+				"          responsable as string,",
+				"          nro_guia_despacho as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> despachos",
+				"source(output(",
+				"          recepcion_id as integer,",
+				"          nro_lote as string,",
+				"          almacen_id as integer,",
+				"          transportista_id as integer,",
+				"          vehiculo_id as integer,",
+				"          empresa_origen as string,",
+				"          fecha_recepcion as date,",
+				"          cantidad_recibida as decimal(12,2),",
+				"          unidad as string,",
+				"          condicion as string,",
+				"          estado as string,",
+				"          responsable as string,",
+				"          nro_guia_remision as string,",
+				"          temperatura_llegada as decimal(6,2)",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> recepciones",
+				"source(output(",
+				"          transportista_id as integer,",
+				"          razon_social as string,",
+				"          nit as string,",
+				"          municipio as string,",
+				"          contacto as string,",
+				"          telefono as string,",
+				"          estado as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> transportistas",
+				"source(output(",
+				"          vehiculo_id as integer,",
+				"          transportista_id as integer,",
+				"          descripcion as string,",
+				"          placa as string,",
+				"          tipo as string,",
+				"          capacidad_kg as integer,",
+				"          estado as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> vehiculos"
 			]
 		}
 	}
