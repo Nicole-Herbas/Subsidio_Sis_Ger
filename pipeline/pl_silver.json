@@ -5,7 +5,14 @@
 			{
 				"name": "df_segip",
 				"type": "ExecuteDataFlow",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "Script1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -29,7 +36,14 @@
 			{
 				"name": "df_bja",
 				"type": "ExecuteDataFlow",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "df_segip",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -53,7 +67,14 @@
 			{
 				"name": "df_sedem",
 				"type": "ExecuteDataFlow",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "df_bja",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -77,7 +98,14 @@
 			{
 				"name": "df_agencia",
 				"type": "ExecuteDataFlow",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "df_sedem",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -101,7 +129,14 @@
 			{
 				"name": "df_sup",
 				"type": "ExecuteDataFlow",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "df_agencia",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -120,6 +155,32 @@
 						"computeType": "General"
 					},
 					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "Script1",
+				"type": "Script",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "db_subsidio",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "NonQuery",
+							"text": "-- ============================================================\n-- LIMPIAR TODAS LAS TABLAS DE SILVER\n-- (no hay FKs entre ellas, pero se mantiene un orden lógico)\n-- ============================================================\n\n-- SEGIP\nDELETE FROM silver.segip_personas;\n\n-- BJA\nDELETE FROM silver.bja_controles_pediatricos;\nDELETE FROM silver.bja_pagos;\nDELETE FROM silver.bja_partos;\nDELETE FROM silver.bja_controles_prenatales;\nDELETE FROM silver.bja_inscripciones;\nDELETE FROM silver.bja_establecimientos_salud;\n\n-- SUP\nDELETE FROM silver.sup_entregas;\nDELETE FROM silver.sup_boletas;\nDELETE FROM silver.sup_controles;\nDELETE FROM silver.sup_inscripciones;\nDELETE FROM silver.sup_catalogo_paquetes;\nDELETE FROM silver.sup_establecimientos;\n\n-- SEDEM\nDELETE FROM silver.sedem_inventario;\nDELETE FROM silver.sedem_control_calidad;\nDELETE FROM silver.sedem_produccion;\nDELETE FROM silver.sedem_productos;\nDELETE FROM silver.sedem_plantas;\nDELETE FROM silver.sedem_empresas;\n\n-- AGENCIA DISTRIBUIDORA\nDELETE FROM silver.agencia_despachos;\nDELETE FROM silver.agencia_recepciones;\nDELETE FROM silver.agencia_vehiculos;\nDELETE FROM silver.agencia_transportistas;\nDELETE FROM silver.agencia_almacenes;"
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
 				}
 			}
 		],

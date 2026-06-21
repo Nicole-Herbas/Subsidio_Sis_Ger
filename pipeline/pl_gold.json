@@ -52,7 +52,7 @@
 				"typeProperties": {
 					"scripts": [
 						{
-							"type": "Query",
+							"type": "NonQuery",
 							"text": "-- Limpiar HIJOS primero (tablas de hechos)\nDELETE FROM gold.fact_beneficiaria_subsidio;\nDELETE FROM gold.fact_cadena_suministro;\n\n-- Luego dimensiones dependientes\nDELETE FROM gold.dim_planta_sedem;\nDELETE FROM gold.dim_producto_sedem;\nDELETE FROM gold.dim_vehiculo;\n\n-- Finalmente las dimensiones base (PADRES)\nDELETE FROM gold.dim_persona;\nDELETE FROM gold.dim_empresa_sedem;\nDELETE FROM gold.dim_almacen;\nDELETE FROM gold.dim_transportista;\nDELETE FROM gold.dim_paquete;\nDELETE FROM gold.dim_establecimiento_salud;"
 						}
 					],
