@@ -24,7 +24,11 @@
 					"name": "sink1"
 				}
 			],
-			"transformations": [],
+			"transformations": [
+				{
+					"name": "aggregate1"
+				}
+			],
 			"scriptLines": [
 				"source(output(",
 				"          empresa_id as integer,",
@@ -41,7 +45,15 @@
 				"     isolationLevel: 'READ_UNCOMMITTED',",
 				"     query: 'SELECT \\n    empresa_id, sigla, nombre, descripcion, nit,\\n    municipio, departamento, estado\\nFROM silver.sedem_empresas',",
 				"     format: 'query') ~> empresas",
-				"empresas sink(allowSchemaDrift: true,",
+				"empresas aggregate(groupBy(empresa_id),",
+				"     sigla = first(sigla),",
+				"          nombre = first(nombre),",
+				"          descripcion = first(descripcion),",
+				"          nit = first(nit),",
+				"          municipio = first(municipio),",
+				"          departamento = first(departamento),",
+				"          estado = first(estado)) ~> aggregate1",
+				"aggregate1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
 				"          empresa_sk as integer,",

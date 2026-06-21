@@ -6,11 +6,53 @@
 		},
 		"type": "MappingDataFlow",
 		"typeProperties": {
-			"sources": [],
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "silver_agencia_vehiculos",
+						"type": "DatasetReference"
+					},
+					"name": "vehiculo"
+				},
+				{
+					"dataset": {
+						"referenceName": "gold_dim_transportista",
+						"type": "DatasetReference"
+					},
+					"name": "transportista"
+				}
+			],
 			"sinks": [],
 			"transformations": [],
 			"scriptLines": [
-				""
+				"source(output(",
+				"          vehiculo_id as integer,",
+				"          transportista_id as integer,",
+				"          descripcion as string,",
+				"          placa as string,",
+				"          tipo as string,",
+				"          capacidad_kg as integer,",
+				"          estado as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'SELECT vehiculo_id, transportista_id, descripcion, placa, tipo, capacidad_kg, estado\\nFROM silver.agencia_vehiculos',",
+				"     format: 'query') ~> vehiculo",
+				"source(output(",
+				"          transportista_sk as integer,",
+				"          transportista_id as integer,",
+				"          razon_social as string,",
+				"          nit as string,",
+				"          municipio as string,",
+				"          contacto as string,",
+				"          telefono as string,",
+				"          estado as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> transportista"
 			]
 		}
 	}

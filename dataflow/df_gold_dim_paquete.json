@@ -24,7 +24,11 @@
 					"name": "sink1"
 				}
 			],
-			"transformations": [],
+			"transformations": [
+				{
+					"name": "aggregate1"
+				}
+			],
 			"scriptLines": [
 				"source(output(",
 				"          paquete_id as integer,",
@@ -38,7 +42,12 @@
 				"     isolationLevel: 'READ_UNCOMMITTED',",
 				"     query: 'SELECT paquete_id, nombre, contenido,\\r\\n       peso_estandar_kg, costo_estimado_bs\\r\\nFROM silver.sup_catalogo_paquetes',",
 				"     format: 'query') ~> paquete",
-				"paquete sink(allowSchemaDrift: true,",
+				"paquete aggregate(groupBy(paquete_id),",
+				"     nombre = first(nombre),",
+				"          contenido = first(contenido),",
+				"          peso_estandar_kg = first(peso_estandar_kg),",
+				"          costo_estimado_bs = first(costo_estimado_bs)) ~> aggregate1",
+				"aggregate1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
 				"          paquete_sk as integer,",

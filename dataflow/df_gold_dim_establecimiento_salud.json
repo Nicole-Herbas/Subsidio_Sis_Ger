@@ -40,6 +40,12 @@
 				},
 				{
 					"name": "union1"
+				},
+				{
+					"name": "aggregate1"
+				},
+				{
+					"name": "aggregate2"
 				}
 			],
 			"scriptLines": [
@@ -78,7 +84,27 @@
 				"BJAestablecimiento derive(sistema_origen = 'BJA') ~> derivedColumn1",
 				"SUPestablecimiento derive(sistema_origen = 'SUP') ~> derivedColumn2",
 				"derivedColumn1, derivedColumn2 union(byName: true)~> union1",
-				"union1 sink(allowSchemaDrift: true,",
+				"union1 aggregate(groupBy(establecimiento_id),",
+				"     codigo_snis = first(codigo_snis),",
+				"          nombre = first(nombre),",
+				"          tipo = first(tipo),",
+				"          nivel_atencion = first(nivel_atencion),",
+				"          municipio = first(municipio),",
+				"          departamento = first(departamento),",
+				"          red_salud = first(red_salud),",
+				"          estado = first(estado),",
+				"          sistema_origen = first(sistema_origen)) ~> aggregate1",
+				"aggregate1 aggregate(groupBy(codigo_snis),",
+				"     establecimiento_id = first(establecimiento_id),",
+				"          nombre = first(nombre),",
+				"          tipo = first(tipo),",
+				"          nivel_atencion = first(nivel_atencion),",
+				"          municipio = first(municipio),",
+				"          departamento = first(departamento),",
+				"          red_salud = first(red_salud),",
+				"          estado = first(estado),",
+				"          sistema_origen = first(sistema_origen)) ~> aggregate2",
+				"aggregate2 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
 				"          establecimiento_sk as integer,",
@@ -103,8 +129,8 @@
 				"     errorHandlingOption: 'stopOnFirstError',",
 				"     mapColumn(",
 				"          establecimiento_id,",
-				"          codigo_snis,",
-				"          nombre,",
+				"          codigo_snis = establecimiento_id,",
+				"          nombre = codigo_snis,",
 				"          tipo,",
 				"          nivel_atencion,",
 				"          municipio,",

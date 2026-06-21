@@ -53,7 +53,7 @@
 					"scripts": [
 						{
 							"type": "Query",
-							"text": "DELETE FROM gold.fact_agencia_despacho;\nDELETE FROM gold.fact_agencia_recepcion;\nDELETE FROM gold.fact_sedem_inventario;\nDELETE FROM gold.fact_sedem_control_calidad;\nDELETE FROM gold.fact_sedem_produccion;\nDELETE FROM gold.fact_sup_entrega;\nDELETE FROM gold.fact_sup_boleta;\nDELETE FROM gold.fact_sup_control_prenatal;\nDELETE FROM gold.fact_sup_inscripcion;\nDELETE FROM gold.fact_bja_control_pediatrico;\nDELETE FROM gold.fact_bja_pago;\nDELETE FROM gold.fact_bja_parto;\nDELETE FROM gold.fact_bja_control_prenatal;\nDELETE FROM gold.fact_bja_inscripcion;\n\nDELETE FROM gold.dim_vehiculo;\nDELETE FROM gold.dim_transportista;\nDELETE FROM gold.dim_almacen;\nDELETE FROM gold.dim_paquete;\nDELETE FROM gold.dim_producto_sedem;\nDELETE FROM gold.dim_planta_sedem;\nDELETE FROM gold.dim_empresa_sedem;\nDELETE FROM gold.dim_establecimiento_salud;\nDELETE FROM gold.dim_persona;\n\nDELETE FROM gold.fact_beneficiaria_subsidio;\nDELETE FROM gold.fact_cadena_suministro;"
+							"text": "-- Limpiar HIJOS primero (tablas de hechos)\nDELETE FROM gold.fact_beneficiaria_subsidio;\nDELETE FROM gold.fact_cadena_suministro;\n\n-- Luego dimensiones dependientes\nDELETE FROM gold.dim_planta_sedem;\nDELETE FROM gold.dim_producto_sedem;\nDELETE FROM gold.dim_vehiculo;\n\n-- Finalmente las dimensiones base (PADRES)\nDELETE FROM gold.dim_persona;\nDELETE FROM gold.dim_empresa_sedem;\nDELETE FROM gold.dim_almacen;\nDELETE FROM gold.dim_transportista;\nDELETE FROM gold.dim_paquete;\nDELETE FROM gold.dim_establecimiento_salud;"
 						}
 					],
 					"scriptBlockExecutionTimeout": "02:00:00"

@@ -6,11 +6,118 @@
 		},
 		"type": "MappingDataFlow",
 		"typeProperties": {
-			"sources": [],
-			"sinks": [],
-			"transformations": [],
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "silver_sedem_productos",
+						"type": "DatasetReference"
+					},
+					"name": "productos"
+				},
+				{
+					"dataset": {
+						"referenceName": "gold_dim_empresa_sedem",
+						"type": "DatasetReference"
+					},
+					"name": "empresa"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "gold_dim_producto_sedem",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "lookup1"
+				},
+				{
+					"name": "select1"
+				},
+				{
+					"name": "aggregate1"
+				}
+			],
 			"scriptLines": [
-				""
+				"source(output(",
+				"          producto_id as integer,",
+				"          empresa_id as integer,",
+				"          nombre as string,",
+				"          categoria as string,",
+				"          presentacion as string,",
+				"          estado as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'SELECT producto_id, empresa_id, nombre, categoria, presentacion, estado\\r\\nFROM silver.sedem_productos',",
+				"     format: 'query') ~> productos",
+				"source(output(",
+				"          empresa_sk as integer,",
+				"          empresa_id as integer,",
+				"          sigla as string,",
+				"          nombre as string,",
+				"          descripcion as string,",
+				"          nit as string,",
+				"          municipio as string,",
+				"          departamento as string,",
+				"          estado as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> empresa",
+				"productos, empresa lookup(productos@empresa_id == empresa@empresa_id,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup1",
+				"lookup1 select(mapColumn(",
+				"          producto_id,",
+				"          nombre = productos@nombre,",
+				"          categoria,",
+				"          presentacion,",
+				"          estado = productos@estado,",
+				"          empresa_sk",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 aggregate(groupBy(producto_id),",
+				"     nombre = first(nombre),",
+				"          categoria = first(categoria),",
+				"          presentacion = first(presentacion),",
+				"          estado = first(estado),",
+				"          empresa_sk = first(empresa_sk)) ~> aggregate1",
+				"aggregate1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          producto_sk as integer,",
+				"          producto_id as integer,",
+				"          empresa_sk as integer,",
+				"          nombre as string,",
+				"          categoria as string,",
+				"          presentacion as string,",
+				"          estado as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          producto_id,",
+				"          empresa_sk,",
+				"          nombre,",
+				"          categoria,",
+				"          presentacion,",
+				"          estado",
+				"     )) ~> sink1"
 			]
 		}
 	}
