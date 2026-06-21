@@ -24,11 +24,7 @@
 					"name": "sink1"
 				}
 			],
-			"transformations": [
-				{
-					"name": "aggregate1"
-				}
-			],
+			"transformations": [],
 			"scriptLines": [
 				"source(output(",
 				"          ci as string,",
@@ -46,16 +42,7 @@
 				"     isolationLevel: 'READ_UNCOMMITTED',",
 				"     query: 'SELECT\\r\\n    ci,\\r\\n    nombres,\\r\\n    apellido_paterno,\\r\\n    fecha_nacimiento,\\r\\n    estado_civil,\\r\\n    profesion,\\r\\n    nivel_estudios,\\r\\n    municipio_residencia,\\r\\n    genero\\r\\nFROM silver.segip_personas',",
 				"     format: 'query') ~> personas",
-				"personas aggregate(groupBy(ci),",
-				"     nombres = first(nombres),",
-				"          apellido_paterno = first(apellido_paterno),",
-				"          fecha_nacimiento = first(fecha_nacimiento),",
-				"          estado_civil = first(estado_civil),",
-				"          profesion = first(profesion),",
-				"          nivel_estudios = first(nivel_estudios),",
-				"          municipio_residencia = first(municipio_residencia),",
-				"          genero = first(genero)) ~> aggregate1",
-				"aggregate1 sink(allowSchemaDrift: true,",
+				"personas sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
 				"          persona_sk as integer,",
@@ -84,7 +71,7 @@
 				"     skipDuplicateMapOutputs: true,",
 				"     errorHandlingOption: 'stopOnFirstError',",
 				"     mapColumn(",
-				"          ci = nombres,",
+				"          ci,",
 				"          nombres,",
 				"          apellido_paterno,",
 				"          fecha_nacimiento,",
