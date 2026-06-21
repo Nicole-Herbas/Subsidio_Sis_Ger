@@ -16,7 +16,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataflow": {
-						"referenceName": "df_silver_segip_limpieza_datos",
+						"referenceName": "df_gold_bja_filtro",
 						"type": "DataFlowReference"
 					},
 					"compute": {
