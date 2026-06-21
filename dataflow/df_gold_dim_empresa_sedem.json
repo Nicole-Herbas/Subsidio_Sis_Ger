@@ -6,11 +6,73 @@
 		},
 		"type": "MappingDataFlow",
 		"typeProperties": {
-			"sources": [],
-			"sinks": [],
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "silver_sedem_empresas",
+						"type": "DatasetReference"
+					},
+					"name": "empresas"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "gold_dim_empresa_sedem",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
 			"transformations": [],
 			"scriptLines": [
-				""
+				"source(output(",
+				"          empresa_id as integer,",
+				"          sigla as string,",
+				"          nombre as string,",
+				"          descripcion as string,",
+				"          nit as string,",
+				"          municipio as string,",
+				"          departamento as string,",
+				"          estado as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'SELECT \\n    empresa_id, sigla, nombre, descripcion, nit,\\n    municipio, departamento, estado\\nFROM silver.sedem_empresas',",
+				"     format: 'query') ~> empresas",
+				"empresas sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          empresa_sk as integer,",
+				"          empresa_id as integer,",
+				"          sigla as string,",
+				"          nombre as string,",
+				"          descripcion as string,",
+				"          nit as string,",
+				"          municipio as string,",
+				"          departamento as string,",
+				"          estado as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     truncate:true,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          empresa_id,",
+				"          sigla,",
+				"          nombre,",
+				"          descripcion,",
+				"          nit,",
+				"          municipio,",
+				"          departamento,",
+				"          estado",
+				"     )) ~> sink1"
 			]
 		}
 	}
