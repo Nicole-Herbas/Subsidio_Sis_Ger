@@ -306,7 +306,7 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
-				"     query: 'SELECT ci_beneficiaria, paquete_id,\\r\\n       fecha_entrega, peso_paquete_kg, lote_produccion as nro_lote\\r\\nFROM silver.sup_entregas\\r\\nWHERE fecha_entrega IS NOT NULL',",
+				"     query: 'SELECT ci_beneficiaria, paquete_id,\\r\\n       fecha_entrega, peso_paquete_kg, lote_produccion as nro_lote\\r\\nFROM silver.sup_entregas\\r\\nWHERE fecha_entrega IS NOT NULL\\r\\nAND lote_produccion IS NOT NULL',",
 				"     format: 'query') ~> SupEntrega",
 				"source(output(",
 				"          persona_sk as integer,",
