@@ -6,11 +6,427 @@
 		},
 		"type": "MappingDataFlow",
 		"typeProperties": {
-			"sources": [],
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "silver_bja_inscripciones",
+						"type": "DatasetReference"
+					},
+					"name": "BjaInscripcion"
+				},
+				{
+					"dataset": {
+						"referenceName": "gold_dim_persona",
+						"type": "DatasetReference"
+					},
+					"name": "personaGold"
+				},
+				{
+					"dataset": {
+						"referenceName": "gold_dim_establecimiento_salud",
+						"type": "DatasetReference"
+					},
+					"name": "EstablecimientoGold"
+				},
+				{
+					"dataset": {
+						"referenceName": "silver_bja_controles_prenatales",
+						"type": "DatasetReference"
+					},
+					"name": "BjaControlPrenatal"
+				},
+				{
+					"dataset": {
+						"referenceName": "silver_bja_partos",
+						"type": "DatasetReference"
+					},
+					"name": "BjaParto"
+				},
+				{
+					"dataset": {
+						"referenceName": "silver_bja_pagos",
+						"type": "DatasetReference"
+					},
+					"name": "BjaPago"
+				},
+				{
+					"dataset": {
+						"referenceName": "silver_bja_controles_pediatricos",
+						"type": "DatasetReference"
+					},
+					"name": "BjaPediatrico"
+				},
+				{
+					"dataset": {
+						"referenceName": "silver_sup_inscripciones",
+						"type": "DatasetReference"
+					},
+					"name": "SupInscripcion"
+				}
+			],
 			"sinks": [],
-			"transformations": [],
+			"transformations": [
+				{
+					"name": "lookup1"
+				},
+				{
+					"name": "lookup2"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "select1"
+				},
+				{
+					"name": "lookup3"
+				},
+				{
+					"name": "lookup4"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "select2"
+				},
+				{
+					"name": "lookup5"
+				},
+				{
+					"name": "lookup6"
+				},
+				{
+					"name": "derivedColumn3"
+				},
+				{
+					"name": "select3"
+				},
+				{
+					"name": "lookup7"
+				},
+				{
+					"name": "derivedColumn4"
+				},
+				{
+					"name": "select4"
+				},
+				{
+					"name": "lookup8"
+				},
+				{
+					"name": "lookup9"
+				},
+				{
+					"name": "derivedColumn5"
+				},
+				{
+					"name": "select5"
+				},
+				{
+					"name": "lookup10"
+				},
+				{
+					"name": "lookup11"
+				},
+				{
+					"name": "derivedColumn6"
+				},
+				{
+					"name": "select6"
+				}
+			],
 			"scriptLines": [
-				""
+				"source(output(",
+				"          inscripcion_id as integer,",
+				"          ci_beneficiaria as string,",
+				"          establecimiento_id as integer,",
+				"          fecha_inscripcion as date,",
+				"          semana_gestacion as integer,",
+				"          estado as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'SELECT inscripcion_id, ci_beneficiaria, establecimiento_id,\\r\\n       fecha_inscripcion, semana_gestacion, estado\\r\\nFROM silver.bja_inscripciones\\r\\nWHERE fecha_inscripcion IS NOT NULL',",
+				"     format: 'query') ~> BjaInscripcion",
+				"source(output(",
+				"          persona_sk as integer,",
+				"          ci as string,",
+				"          nombres as string,",
+				"          apellido_paterno as string,",
+				"          apellido_materno as string,",
+				"          fecha_nacimiento as date,",
+				"          genero as string,",
+				"          estado_civil as string,",
+				"          profesion as string,",
+				"          nivel_estudios as string,",
+				"          municipio_residencia as string,",
+				"          ci_padre as string,",
+				"          ci_madre as string,",
+				"          ci_conyuge as string,",
+				"          numero_hijos as integer,",
+				"          fecha_emision_ci as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> personaGold",
+				"source(output(",
+				"          establecimiento_sk as integer,",
+				"          establecimiento_id as integer,",
+				"          codigo_snis as string,",
+				"          nombre as string,",
+				"          tipo as string,",
+				"          nivel_atencion as string,",
+				"          municipio as string,",
+				"          departamento as string,",
+				"          red_salud as string,",
+				"          estado as string,",
+				"          sistema_origen as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> EstablecimientoGold",
+				"source(output(",
+				"          control_prenatal_id as integer,",
+				"          ci_beneficiaria as string,",
+				"          establecimiento_id as integer,",
+				"          nro_control as integer,",
+				"          fecha_control as date,",
+				"          semana_gestacion as integer,",
+				"          peso_madre_kg as decimal(5,2),",
+				"          presion_sistolica as short,",
+				"          presion_diastolica as short,",
+				"          resultado as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'SELECT control_prenatal_id, ci_beneficiaria, establecimiento_id,\\r\\n       nro_control, fecha_control, semana_gestacion,\\r\\n       peso_madre_kg, presion_sistolica, presion_diastolica, resultado\\r\\nFROM silver.bja_controles_prenatales\\r\\nWHERE fecha_control IS NOT NULL',",
+				"     format: 'query') ~> BjaControlPrenatal",
+				"source(output(",
+				"          parto_id as integer,",
+				"          ci_madre as string,",
+				"          establecimiento_id as integer,",
+				"          fecha_parto as date,",
+				"          tipo_parto as string,",
+				"          peso_nacimiento_kg as decimal(5,3),",
+				"          talla_nacimiento_cm as decimal(5,1)",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'SELECT parto_id, ci_madre, establecimiento_id, fecha_parto,\\r\\n       tipo_parto, peso_nacimiento_kg, talla_nacimiento_cm\\r\\nFROM silver.bja_partos\\r\\nWHERE fecha_parto IS NOT NULL',",
+				"     format: 'query') ~> BjaParto",
+				"source(output(",
+				"          pago_id as integer,",
+				"          ci_beneficiaria as string,",
+				"          concepto_pago as string,",
+				"          monto_bs as decimal(10,2),",
+				"          fecha_pago as date,",
+				"          estado_pago as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'SELECT pago_id, ci_beneficiaria, concepto_pago,\\n       monto_bs, fecha_pago, estado_pago\\nFROM silver.bja_pagos\\nWHERE fecha_pago IS NOT NULL',",
+				"     format: 'query') ~> BjaPago",
+				"source(output(",
+				"          control_pediatrico_id as integer,",
+				"          ci_nino as string,",
+				"          ci_madre as string,",
+				"          establecimiento_id as integer,",
+				"          nro_control as integer,",
+				"          fecha_control as date,",
+				"          peso_nino_kg as decimal(5,2),",
+				"          talla_nino_cm as decimal(5,1),",
+				"          vacuna_aplicada as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'SELECT control_pediatrico_id, ci_nino, ci_madre, establecimiento_id,\\r\\n       nro_control, fecha_control, peso_nino_kg, talla_nino_cm, vacuna_aplicada\\r\\nFROM silver.bja_controles_pediatricos\\r\\nWHERE fecha_control IS NOT NULL',",
+				"     format: 'query') ~> BjaPediatrico",
+				"source(output(",
+				"          inscripcion_id as integer,",
+				"          ci_beneficiaria as string,",
+				"          establecimiento_id as integer,",
+				"          fecha_inscripcion as date,",
+				"          semana_gestacion as integer,",
+				"          estado as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'SELECT inscripcion_id, ci_beneficiaria, establecimiento_id,\\r\\n       fecha_inscripcion, semana_gestacion, estado\\r\\nFROM silver.sup_inscripciones\\r\\nWHERE fecha_inscripcion IS NOT NULL',",
+				"     format: 'query') ~> SupInscripcion",
+				"BjaInscripcion, personaGold lookup(ci_beneficiaria == ci,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup1",
+				"lookup1, EstablecimientoGold lookup(BjaInscripcion@establecimiento_id == EstablecimientoGold@establecimiento_id,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup2",
+				"lookup2 derive(fecha_sk = toInteger(toString(fecha_inscripcion, 'yyyyMMdd')),",
+				"          sistema_origen = 'BJA',",
+				"          tipo_actividad = 'Inscripcion') ~> derivedColumn1",
+				"derivedColumn1 select(mapColumn(",
+				"          persona_sk,",
+				"          ci,",
+				"          nombres,",
+				"          apellido_paterno,",
+				"          municipio_residencia,",
+				"          genero,",
+				"          fecha_sk,",
+				"          sistema_origen,",
+				"          tipo_actividad,",
+				"          establecimiento_sk,",
+				"          semana_gestacion,",
+				"          estado = BjaInscripcion@estado",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"BjaControlPrenatal, personaGold lookup(ci_beneficiaria == ci,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup3",
+				"lookup3, EstablecimientoGold lookup(BjaControlPrenatal@establecimiento_id == EstablecimientoGold@establecimiento_id,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup4",
+				"lookup4 derive(fecha_sk = toInteger(toString(fecha_control, 'yyyyMMdd')),",
+				"          sistema_origen = 'BJA',",
+				"          tipo_actividad = 'Control Prenatal',",
+				"          resultado_control = resultado) ~> derivedColumn2",
+				"derivedColumn2 select(mapColumn(",
+				"          persona_sk,",
+				"          ci,",
+				"          nombres,",
+				"          apellido_paterno,",
+				"          municipio_residencia,",
+				"          genero,",
+				"          semana_gestacion,",
+				"          peso_madre_kg,",
+				"          presion_sistolica,",
+				"          presion_diastolica,",
+				"          fecha_sk,",
+				"          sistema_origen,",
+				"          tipo_actividad,",
+				"          establecimiento_sk,",
+				"          nro_control,",
+				"          resultado_control",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select2",
+				"BjaParto, personaGold lookup(BjaParto@ci_madre == ci,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup5",
+				"lookup5, EstablecimientoGold lookup(BjaParto@establecimiento_id == EstablecimientoGold@establecimiento_id,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup6",
+				"lookup6 derive(fecha_sk = toInteger(toString(fecha_parto, 'yyyyMMdd')),",
+				"          sistema_origen = 'BJA',",
+				"          tipo_actividad = 'Parto') ~> derivedColumn3",
+				"derivedColumn3 select(mapColumn(",
+				"          persona_sk,",
+				"          ci,",
+				"          nombres,",
+				"          apellido_paterno,",
+				"          municipio_residencia,",
+				"          genero,",
+				"          fecha_sk,",
+				"          tipo_parto,",
+				"          peso_nacimiento_kg,",
+				"          talla_nacimiento_cm,",
+				"          sistema_origen,",
+				"          tipo_actividad,",
+				"          establecimiento_sk",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select3",
+				"BjaPago, personaGold lookup(ci_beneficiaria == ci,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup7",
+				"lookup7 derive(fecha_sk = toInteger(toString(fecha_pago, 'yyyyMMdd')),",
+				"          sistema_origen = 'BJA',",
+				"          {monto_pagado_bs } = monto_bs,",
+				"          estado = estado_pago) ~> derivedColumn4",
+				"derivedColumn4 select(mapColumn(",
+				"          persona_sk,",
+				"          ci,",
+				"          nombres,",
+				"          apellido_paterno,",
+				"          municipio_residencia,",
+				"          genero,",
+				"          fecha_sk,",
+				"          sistema_origen,",
+				"          {monto_pagado_bs },",
+				"          estado",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select4",
+				"BjaPediatrico, personaGold lookup(BjaPediatrico@ci_madre == ci,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup8",
+				"lookup8, EstablecimientoGold lookup(BjaPediatrico@establecimiento_id == EstablecimientoGold@establecimiento_id,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup9",
+				"lookup9 derive(fecha_sk = toInteger(toString(fecha_control, 'yyyyMMdd')),",
+				"          sistema_origen = 'BJA',",
+				"          {tipo_actividad } = 'Control Pediatrico') ~> derivedColumn5",
+				"derivedColumn5 select(mapColumn(",
+				"          persona_sk,",
+				"          ci,",
+				"          nombres,",
+				"          apellido_paterno,",
+				"          municipio_residencia,",
+				"          genero,",
+				"          nro_control,",
+				"          peso_nino_kg,",
+				"          talla_nino_cm,",
+				"          vacuna_aplicada,",
+				"          fecha_sk,",
+				"          sistema_origen,",
+				"          {tipo_actividad },",
+				"          establecimiento_sk",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select5",
+				"SupInscripcion, personaGold lookup(ci_beneficiaria == ci,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup10",
+				"lookup10, EstablecimientoGold lookup(SupInscripcion@establecimiento_id == EstablecimientoGold@establecimiento_id,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup11",
+				"lookup11 derive(fecha_sk = toInteger(toString(fecha_inscripcion, 'yyyyMMdd')),",
+				"          sistema_origen = 'SUP',",
+				"          {tipo_actividad } = 'Inscripcion') ~> derivedColumn6",
+				"derivedColumn6 select(mapColumn(",
+				"          persona_sk,",
+				"          inscripcion_id,",
+				"          ci,",
+				"          nombres,",
+				"          apellido_paterno,",
+				"          municipio_residencia,",
+				"          genero,",
+				"          fecha_sk,",
+				"          sistema_origen,",
+				"          {tipo_actividad },",
+				"          establecimiento_sk,",
+				"          estado = SupInscripcion@estado",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select6"
 			]
 		}
 	}
