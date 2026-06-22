@@ -209,6 +209,33 @@
 				},
 				{
 					"name": "union1"
+				},
+				{
+					"name": "filter1"
+				},
+				{
+					"name": "filter2"
+				},
+				{
+					"name": "filter3"
+				},
+				{
+					"name": "filter4"
+				},
+				{
+					"name": "filter5"
+				},
+				{
+					"name": "filter6"
+				},
+				{
+					"name": "filter7"
+				},
+				{
+					"name": "filter8"
+				},
+				{
+					"name": "filter9"
 				}
 			],
 			"scriptLines": [
@@ -396,7 +423,7 @@
 				"     multiple: false,",
 				"     pickup: 'any',",
 				"     broadcast: 'auto')~> lookup1",
-				"lookup1, EstablecimientoGold lookup(BjaInscripcion@establecimiento_id == EstablecimientoGold@establecimiento_id,",
+				"filter1, EstablecimientoGold lookup(BjaInscripcion@establecimiento_id == EstablecimientoGold@establecimiento_id,",
 				"     multiple: false,",
 				"     pickup: 'any',",
 				"     broadcast: 'auto')~> lookup2",
@@ -423,7 +450,7 @@
 				"     multiple: false,",
 				"     pickup: 'any',",
 				"     broadcast: 'auto')~> lookup3",
-				"lookup3, EstablecimientoGold lookup(BjaControlPrenatal@establecimiento_id == EstablecimientoGold@establecimiento_id,",
+				"filter2, EstablecimientoGold lookup(BjaControlPrenatal@establecimiento_id == EstablecimientoGold@establecimiento_id,",
 				"     multiple: false,",
 				"     pickup: 'any',",
 				"     broadcast: 'auto')~> lookup4",
@@ -455,7 +482,7 @@
 				"     multiple: false,",
 				"     pickup: 'any',",
 				"     broadcast: 'auto')~> lookup5",
-				"lookup5, EstablecimientoGold lookup(BjaParto@establecimiento_id == EstablecimientoGold@establecimiento_id,",
+				"filter9, EstablecimientoGold lookup(BjaParto@establecimiento_id == EstablecimientoGold@establecimiento_id,",
 				"     multiple: false,",
 				"     pickup: 'any',",
 				"     broadcast: 'auto')~> lookup6",
@@ -483,7 +510,7 @@
 				"     multiple: false,",
 				"     pickup: 'any',",
 				"     broadcast: 'auto')~> lookup7",
-				"lookup7 derive(fecha_sk = toInteger(toString(fecha_pago, 'yyyyMMdd')),",
+				"filter3 derive(fecha_sk = toInteger(toString(fecha_pago, 'yyyyMMdd')),",
 				"          sistema_origen = 'BJA',",
 				"          {monto_pagado_bs } = monto_bs,",
 				"          estado = estado_pago) ~> derivedColumn4",
@@ -505,7 +532,7 @@
 				"     multiple: false,",
 				"     pickup: 'any',",
 				"     broadcast: 'auto')~> lookup8",
-				"lookup8, EstablecimientoGold lookup(BjaPediatrico@establecimiento_id == EstablecimientoGold@establecimiento_id,",
+				"filter8, EstablecimientoGold lookup(BjaPediatrico@establecimiento_id == EstablecimientoGold@establecimiento_id,",
 				"     multiple: false,",
 				"     pickup: 'any',",
 				"     broadcast: 'auto')~> lookup9",
@@ -534,7 +561,7 @@
 				"     multiple: false,",
 				"     pickup: 'any',",
 				"     broadcast: 'auto')~> lookup10",
-				"lookup10, EstablecimientoGold lookup(SupInscripcion@establecimiento_id == EstablecimientoGold@establecimiento_id,",
+				"filter4, EstablecimientoGold lookup(SupInscripcion@establecimiento_id == EstablecimientoGold@establecimiento_id,",
 				"     multiple: false,",
 				"     pickup: 'any',",
 				"     broadcast: 'auto')~> lookup11",
@@ -561,7 +588,7 @@
 				"     multiple: false,",
 				"     pickup: 'any',",
 				"     broadcast: 'auto')~> lookup12",
-				"lookup12, EstablecimientoGold lookup(SupControlPrenatal@establecimiento_id == EstablecimientoGold@establecimiento_id,",
+				"filter7, EstablecimientoGold lookup(SupControlPrenatal@establecimiento_id == EstablecimientoGold@establecimiento_id,",
 				"     multiple: false,",
 				"     pickup: 'any',",
 				"     broadcast: 'auto')~> lookup13",
@@ -590,7 +617,7 @@
 				"     multiple: false,",
 				"     pickup: 'any',",
 				"     broadcast: 'auto')~> lookup14",
-				"lookup14 derive({fecha_sk } = toInteger(toString(fecha_emision, 'yyyyMMdd')),",
+				"filter5 derive({fecha_sk } = toInteger(toString(fecha_emision, 'yyyyMMdd')),",
 				"          {sistema_origen } = 'SUP',",
 				"          tipo_actividad = 'Boleta Emitida') ~> derivedColumn8",
 				"derivedColumn8 select(mapColumn(",
@@ -611,7 +638,7 @@
 				"     multiple: false,",
 				"     pickup: 'any',",
 				"     broadcast: 'auto')~> lookup15",
-				"lookup15, EstablecimientoGold lookup(SupEntrega@establecimiento_id == EstablecimientoGold@establecimiento_id,",
+				"filter6, EstablecimientoGold lookup(SupEntrega@establecimiento_id == EstablecimientoGold@establecimiento_id,",
 				"     multiple: false,",
 				"     pickup: 'any',",
 				"     broadcast: 'auto')~> lookup16",
@@ -642,6 +669,15 @@
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> select9",
 				"select1, select2, select3, select4, select5, select6, select7, select8, select9 union(byName: true)~> union1",
+				"lookup1 filter(!isNull(persona_sk)) ~> filter1",
+				"lookup3 filter(!isNull(persona_sk)) ~> filter2",
+				"lookup7 filter(!isNull(persona_sk)) ~> filter3",
+				"lookup10 filter(!isNull(persona_sk)) ~> filter4",
+				"lookup14 filter(!isNull(persona_sk)) ~> filter5",
+				"lookup15 filter(!isNull(persona_sk)) ~> filter6",
+				"lookup12 filter(!isNull(persona_sk)) ~> filter7",
+				"lookup8 filter(!isNull(persona_sk)) ~> filter8",
+				"lookup5 filter(!isNull(persona_sk)) ~> filter9",
 				"union1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
