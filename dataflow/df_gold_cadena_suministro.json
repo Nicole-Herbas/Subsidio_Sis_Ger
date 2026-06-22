@@ -147,6 +147,12 @@
 				},
 				{
 					"name": "lookup11"
+				},
+				{
+					"name": "select4"
+				},
+				{
+					"name": "union1"
 				}
 			],
 			"scriptLines": [
@@ -430,7 +436,19 @@
 				"lookup10, PaqueteGold lookup(SupEntrega@paquete_id == PaqueteGold@paquete_id,",
 				"     multiple: false,",
 				"     pickup: 'any',",
-				"     broadcast: 'auto')~> lookup11"
+				"     broadcast: 'auto')~> lookup11",
+				"derivedColumn4 select(mapColumn(",
+				"          tipo_movimiento,",
+				"          fecha_sk,",
+				"          persona_sk,",
+				"          ci_beneficiaria,",
+				"          paquete_sk,",
+				"          peso_paquete_kg,",
+				"          estado",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select4",
+				"select1, select2, SedemProduccion union(byName: true)~> union1"
 			]
 		}
 	}
