@@ -16,7 +16,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataflow": {
-						"referenceName": "df_gold_beneficiaria_subsidio",
+						"referenceName": "df_gold_cadena_suministro",
 						"type": "DataFlowReference"
 					},
 					"compute": {

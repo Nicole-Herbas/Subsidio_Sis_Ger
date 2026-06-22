@@ -92,7 +92,15 @@
 					"name": "PaqueteGold"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "Gold_fact_cadena_suministro",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
 			"transformations": [
 				{
 					"name": "lookup1"
@@ -448,7 +456,66 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> select4",
-				"select1, select2, SedemProduccion union(byName: true)~> union1"
+				"select1, select2, select3, select4 union(byName: true)~> union1",
+				"union1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          movimiento_sk as integer,",
+				"          nro_lote as string,",
+				"          empresa_sk as integer,",
+				"          empresa_sigla as string,",
+				"          tipo_movimiento as string,",
+				"          fecha_sk as integer,",
+				"          producto_sk as integer,",
+				"          planta_sk as integer,",
+				"          turno as string,",
+				"          cantidad_producida as decimal(12,2),",
+				"          unidad as string,",
+				"          costo_produccion as decimal(14,2),",
+				"          almacen_sk as integer,",
+				"          transportista_sk as integer,",
+				"          vehiculo_sk as integer,",
+				"          cantidad_movida as decimal(12,2),",
+				"          centro_destino as string,",
+				"          temperatura_llegada as decimal(6,2),",
+				"          persona_sk as integer,",
+				"          ci_beneficiaria as string,",
+				"          paquete_sk as integer,",
+				"          peso_paquete_kg as decimal(6,2),",
+				"          estado as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          nro_lote,",
+				"          empresa_sk,",
+				"          empresa_sigla,",
+				"          tipo_movimiento,",
+				"          fecha_sk,",
+				"          producto_sk,",
+				"          planta_sk,",
+				"          turno,",
+				"          cantidad_producida,",
+				"          unidad,",
+				"          costo_produccion,",
+				"          almacen_sk,",
+				"          transportista_sk,",
+				"          vehiculo_sk,",
+				"          cantidad_movida,",
+				"          centro_destino,",
+				"          temperatura_llegada,",
+				"          persona_sk,",
+				"          ci_beneficiaria,",
+				"          paquete_sk,",
+				"          peso_paquete_kg,",
+				"          estado",
+				"     )) ~> sink1"
 			]
 		}
 	}
