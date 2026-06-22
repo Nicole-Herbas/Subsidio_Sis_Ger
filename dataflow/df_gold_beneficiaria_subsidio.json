@@ -92,7 +92,15 @@
 					"name": "PaqueteGold"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "gold_fact_beneficiaria_subsidio",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
 			"transformations": [
 				{
 					"name": "lookup1"
@@ -198,6 +206,9 @@
 				},
 				{
 					"name": "select9"
+				},
+				{
+					"name": "union1"
 				}
 			],
 			"scriptLines": [
@@ -629,7 +640,83 @@
 				"          costo_paquete_bs",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> select9"
+				"     skipDuplicateMapOutputs: true) ~> select9",
+				"select1, select2, select3, select4, select5, select6, select7, select8, select9 union(byName: true)~> union1",
+				"union1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          evento_sk as integer,",
+				"          persona_sk as integer,",
+				"          ci as string,",
+				"          nombres as string,",
+				"          apellido_paterno as string,",
+				"          municipio_residencia as string,",
+				"          departamento_residencia as string,",
+				"          genero as string,",
+				"          fecha_sk as integer,",
+				"          sistema_origen as string,",
+				"          tipo_actividad as string,",
+				"          establecimiento_sk as integer,",
+				"          monto_pagado_bs as decimal(10,2),",
+				"          tipo_pago as string,",
+				"          semana_gestacion as integer,",
+				"          nro_control as integer,",
+				"          peso_madre_kg as decimal(5,2),",
+				"          presion_sistolica as integer,",
+				"          presion_diastolica as integer,",
+				"          resultado_control as string,",
+				"          tipo_parto as string,",
+				"          peso_nacimiento_kg as decimal(5,3),",
+				"          talla_nacimiento_cm as decimal(5,1),",
+				"          peso_nino_kg as decimal(5,2),",
+				"          talla_nino_cm as decimal(5,1),",
+				"          vacuna_aplicada as string,",
+				"          paquete_sk as integer,",
+				"          tipo_paquete as string,",
+				"          peso_paquete_kg as decimal(6,2),",
+				"          costo_paquete_bs as decimal(10,2),",
+				"          empresa_lote as string,",
+				"          nro_lote as string,",
+				"          estado as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          persona_sk,",
+				"          ci,",
+				"          nombres,",
+				"          apellido_paterno,",
+				"          municipio_residencia,",
+				"          genero,",
+				"          fecha_sk,",
+				"          sistema_origen,",
+				"          tipo_actividad,",
+				"          establecimiento_sk,",
+				"          monto_pagado_bs = {monto_pagado_bs },",
+				"          semana_gestacion,",
+				"          nro_control,",
+				"          peso_madre_kg,",
+				"          presion_sistolica,",
+				"          presion_diastolica,",
+				"          resultado_control,",
+				"          tipo_parto,",
+				"          peso_nacimiento_kg,",
+				"          talla_nacimiento_cm,",
+				"          peso_nino_kg,",
+				"          talla_nino_cm,",
+				"          vacuna_aplicada,",
+				"          paquete_sk,",
+				"          tipo_paquete,",
+				"          peso_paquete_kg,",
+				"          costo_paquete_bs,",
+				"          estado",
+				"     )) ~> sink1"
 			]
 		}
 	}
