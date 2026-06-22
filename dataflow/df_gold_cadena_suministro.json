@@ -373,8 +373,7 @@
 				"          turno,",
 				"          cantidad_producida,",
 				"          unidad,",
-				"          costo_produccion,",
-				"          estado = SedemProduccion@estado",
+				"          costo_produccion",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> select1",
@@ -455,8 +454,8 @@
 				"          ci_beneficiaria,",
 				"          paquete_sk,",
 				"          peso_paquete_kg,",
-				"          estado,",
-				"          nro_lote",
+				"          nro_lote,",
+				"          estado",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> select4",
@@ -518,8 +517,7 @@
 				"          persona_sk,",
 				"          ci_beneficiaria,",
 				"          paquete_sk,",
-				"          peso_paquete_kg,",
-				"          estado",
+				"          peso_paquete_kg",
 				"     )) ~> sink1"
 			]
 		}
