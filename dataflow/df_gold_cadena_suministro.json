@@ -8,14 +8,429 @@
 		"typeProperties": {
 			"sources": [
 				{
-					"name": "source1"
+					"dataset": {
+						"referenceName": "silver_sedem_produccion",
+						"type": "DatasetReference"
+					},
+					"name": "SedemProduccion"
+				},
+				{
+					"dataset": {
+						"referenceName": "gold_dim_empresa_sedem",
+						"type": "DatasetReference"
+					},
+					"name": "EmpresaGold"
+				},
+				{
+					"dataset": {
+						"referenceName": "gold_dim_planta_sedem",
+						"type": "DatasetReference"
+					},
+					"name": "PlantaGold"
+				},
+				{
+					"dataset": {
+						"referenceName": "gold_dim_producto_sedem",
+						"type": "DatasetReference"
+					},
+					"name": "ProductoGold"
+				},
+				{
+					"dataset": {
+						"referenceName": "silver_agencia_recepciones",
+						"type": "DatasetReference"
+					},
+					"name": "AgenciaRecepcion"
+				},
+				{
+					"dataset": {
+						"referenceName": "gold_dim_almacen",
+						"type": "DatasetReference"
+					},
+					"name": "AlmacenGold"
+				},
+				{
+					"dataset": {
+						"referenceName": "gold_dim_transportista",
+						"type": "DatasetReference"
+					},
+					"name": "TransportistaGold"
+				},
+				{
+					"dataset": {
+						"referenceName": "gold_dim_vehiculo",
+						"type": "DatasetReference"
+					},
+					"name": "VehiculoGold"
+				},
+				{
+					"dataset": {
+						"referenceName": "silver_agencia_despachos",
+						"type": "DatasetReference"
+					},
+					"name": "AgenciaDespacho"
+				},
+				{
+					"dataset": {
+						"referenceName": "silver_sup_entregas",
+						"type": "DatasetReference"
+					},
+					"name": "SupEntrega"
+				},
+				{
+					"dataset": {
+						"referenceName": "gold_dim_persona",
+						"type": "DatasetReference"
+					},
+					"name": "PersonaGold"
+				},
+				{
+					"dataset": {
+						"referenceName": "gold_dim_paquete",
+						"type": "DatasetReference"
+					},
+					"name": "PaqueteGold"
 				}
 			],
 			"sinks": [],
-			"transformations": [],
+			"transformations": [
+				{
+					"name": "lookup1"
+				},
+				{
+					"name": "lookup2"
+				},
+				{
+					"name": "lookup3"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "select1"
+				},
+				{
+					"name": "lookup4"
+				},
+				{
+					"name": "lookup5"
+				},
+				{
+					"name": "lookup6"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "select2"
+				},
+				{
+					"name": "lookup7"
+				},
+				{
+					"name": "lookup8"
+				},
+				{
+					"name": "lookup9"
+				},
+				{
+					"name": "derivedColumn3"
+				},
+				{
+					"name": "select3"
+				},
+				{
+					"name": "lookup10"
+				},
+				{
+					"name": "derivedColumn4"
+				},
+				{
+					"name": "lookup11"
+				}
+			],
 			"scriptLines": [
-				"source(allowSchemaDrift: true,",
-				"     validateSchema: false) ~> source1"
+				"source(output(",
+				"          nro_lote as string,",
+				"          empresa_id as integer,",
+				"          planta_id as integer,",
+				"          producto_id as integer,",
+				"          fecha_produccion as date,",
+				"          turno as string,",
+				"          cantidad as integer,",
+				"          unidad as string,",
+				"          costo_produccion as decimal(14,2),",
+				"          estado as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'SELECT nro_lote, empresa_id, planta_id, producto_id,\\n       fecha_produccion, turno, cantidad, unidad, costo_produccion, estado\\nFROM silver.sedem_produccion\\nWHERE fecha_produccion IS NOT NULL',",
+				"     format: 'query') ~> SedemProduccion",
+				"source(output(",
+				"          empresa_sk as integer,",
+				"          empresa_id as integer,",
+				"          sigla as string,",
+				"          nombre as string,",
+				"          descripcion as string,",
+				"          nit as string,",
+				"          municipio as string,",
+				"          departamento as string,",
+				"          estado as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> EmpresaGold",
+				"source(output(",
+				"          planta_sk as integer,",
+				"          planta_id as integer,",
+				"          empresa_sk as integer,",
+				"          nombre as string,",
+				"          municipio as string,",
+				"          departamento as string,",
+				"          tipo as string,",
+				"          estado as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> PlantaGold",
+				"source(output(",
+				"          producto_sk as integer,",
+				"          producto_id as integer,",
+				"          empresa_sk as integer,",
+				"          nombre as string,",
+				"          categoria as string,",
+				"          presentacion as string,",
+				"          estado as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> ProductoGold",
+				"source(output(",
+				"          nro_lote as string,",
+				"          almacen_id as integer,",
+				"          transportista_id as integer,",
+				"          vehiculo_id as integer,",
+				"          fecha_recepcion as date,",
+				"          cantidad_recibida as integer,",
+				"          unidad as string,",
+				"          temperatura_llegada as decimal(6,2),",
+				"          estado as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'SELECT nro_lote, almacen_id, transportista_id, vehiculo_id,\\n       fecha_recepcion, cantidad_recibida,\\n       unidad, temperatura_llegada, estado\\nFROM silver.agencia_recepciones\\nWHERE fecha_recepcion IS NOT NULL',",
+				"     format: 'query') ~> AgenciaRecepcion",
+				"source(output(",
+				"          almacen_sk as integer,",
+				"          almacen_id as integer,",
+				"          nombre as string,",
+				"          municipio as string,",
+				"          departamento as string,",
+				"          direccion as string,",
+				"          capacidad_m3 as integer,",
+				"          estado as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> AlmacenGold",
+				"source(output(",
+				"          transportista_sk as integer,",
+				"          transportista_id as integer,",
+				"          razon_social as string,",
+				"          nit as string,",
+				"          municipio as string,",
+				"          contacto as string,",
+				"          telefono as string,",
+				"          estado as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> TransportistaGold",
+				"source(output(",
+				"          vehiculo_sk as integer,",
+				"          vehiculo_id as integer,",
+				"          transportista_sk as integer,",
+				"          descripcion as string,",
+				"          placa as string,",
+				"          tipo as string,",
+				"          capacidad_kg as integer,",
+				"          estado as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> VehiculoGold",
+				"source(output(",
+				"          nro_lote as string,",
+				"          almacen_id as integer,",
+				"          transportista_id as integer,",
+				"          vehiculo_id as integer,",
+				"          fecha_despacho as date,",
+				"          cantidad_despachada as integer,",
+				"          centro_destino as string,",
+				"          estado as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'SELECT nro_lote, almacen_id, transportista_id, vehiculo_id,\\n       fecha_despacho, cantidad_despachada,\\n       centro_destino, estado\\nFROM silver.agencia_despachos\\nWHERE fecha_despacho IS NOT NULL',",
+				"     format: 'query') ~> AgenciaDespacho",
+				"source(output(",
+				"          ci_beneficiaria as string,",
+				"          paquete_id as integer,",
+				"          fecha_entrega as date,",
+				"          peso_paquete_kg as decimal(6,2),",
+				"          lote_produccion as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'SELECT ci_beneficiaria, paquete_id,\\r\\n       fecha_entrega, peso_paquete_kg, lote_produccion\\r\\nFROM silver.sup_entregas\\r\\nWHERE fecha_entrega IS NOT NULL',",
+				"     format: 'query') ~> SupEntrega",
+				"source(output(",
+				"          persona_sk as integer,",
+				"          ci as string,",
+				"          nombres as string,",
+				"          apellido_paterno as string,",
+				"          apellido_materno as string,",
+				"          fecha_nacimiento as date,",
+				"          genero as string,",
+				"          estado_civil as string,",
+				"          profesion as string,",
+				"          nivel_estudios as string,",
+				"          municipio_residencia as string,",
+				"          ci_padre as string,",
+				"          ci_madre as string,",
+				"          ci_conyuge as string,",
+				"          numero_hijos as integer,",
+				"          fecha_emision_ci as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> PersonaGold",
+				"source(output(",
+				"          paquete_sk as integer,",
+				"          paquete_id as integer,",
+				"          nombre as string,",
+				"          contenido as string,",
+				"          tipo_paquete as string,",
+				"          peso_estandar_kg as decimal(6,2),",
+				"          costo_estimado_bs as decimal(10,2)",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> PaqueteGold",
+				"SedemProduccion, EmpresaGold lookup(SedemProduccion@empresa_id == EmpresaGold@empresa_id,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup1",
+				"lookup1, PlantaGold lookup(SedemProduccion@planta_id == PlantaGold@planta_id,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup2",
+				"lookup2, ProductoGold lookup(SedemProduccion@producto_id == ProductoGold@producto_id,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup3",
+				"lookup3 derive(fecha_sk = toInteger(toString(fecha_produccion, 'yyyyMMdd')),",
+				"          tipo_movimiento = 'Produccion',",
+				"          cantidad_producida = cantidad,",
+				"          empresa_sigla = sigla) ~> derivedColumn1",
+				"derivedColumn1 select(mapColumn(",
+				"          nro_lote,",
+				"          empresa_sk = EmpresaGold@empresa_sk,",
+				"          empresa_sigla,",
+				"          tipo_movimiento,",
+				"          fecha_sk,",
+				"          producto_sk,",
+				"          planta_sk,",
+				"          turno,",
+				"          cantidad_producida,",
+				"          unidad,",
+				"          costo_produccion,",
+				"          estado = SedemProduccion@estado",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"AgenciaRecepcion, AlmacenGold lookup(AgenciaRecepcion@almacen_id == AlmacenGold@almacen_id,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup4",
+				"lookup4, TransportistaGold lookup(AgenciaRecepcion@transportista_id == TransportistaGold@transportista_id,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup5",
+				"lookup5, VehiculoGold lookup(AgenciaRecepcion@vehiculo_id == VehiculoGold@vehiculo_id,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup6",
+				"lookup6 derive(fecha_sk = toInteger(toString(fecha_recepcion, 'yyyyMMdd')),",
+				"          tipo_movimiento = 'Recepción Agencia',",
+				"          cantidad_movida = cantidad_recibida) ~> derivedColumn2",
+				"derivedColumn2 select(mapColumn(",
+				"          nro_lote,",
+				"          tipo_movimiento,",
+				"          fecha_sk,",
+				"          almacen_sk,",
+				"          transportista_sk = TransportistaGold@transportista_sk,",
+				"          vehiculo_sk,",
+				"          cantidad_movida,",
+				"          unidad,",
+				"          temperatura_llegada,",
+				"          estado = AgenciaRecepcion@estado",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select2",
+				"AgenciaDespacho, AlmacenGold lookup(AgenciaDespacho@almacen_id == AlmacenGold@almacen_id,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup7",
+				"lookup7, TransportistaGold lookup(AgenciaDespacho@transportista_id == TransportistaGold@transportista_id,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup8",
+				"lookup8, VehiculoGold lookup(AgenciaDespacho@vehiculo_id == VehiculoGold@vehiculo_id,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup9",
+				"lookup9 derive(fecha_sk = toInteger(toString(fecha_despacho, 'yyyyMMdd')),",
+				"          tipo_movimiento = 'Despacho Agencia',",
+				"          cantidad_movida = cantidad_despachada) ~> derivedColumn3",
+				"derivedColumn3 select(mapColumn(",
+				"          nro_lote,",
+				"          tipo_movimiento,",
+				"          fecha_sk,",
+				"          almacen_sk,",
+				"          vehiculo_sk,",
+				"          centro_destino,",
+				"          cantidad_movida,",
+				"          transportista_sk = TransportistaGold@transportista_sk,",
+				"          estado = AgenciaDespacho@estado",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select3",
+				"SupEntrega, PersonaGold lookup(ci_beneficiaria == ci,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup10",
+				"lookup11 derive(fecha_sk = toInteger(toString(fecha_entrega, 'yyyyMMdd')),",
+				"          tipo_movimiento = 'Entrega SUP',",
+				"          estado = 'Entregado',",
+				"          ci_beneficiaria = ci,",
+				"          paquete_sk = paquete_sk) ~> derivedColumn4",
+				"lookup10, PaqueteGold lookup(SupEntrega@paquete_id == PaqueteGold@paquete_id,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup11"
 			]
 		}
 	}
