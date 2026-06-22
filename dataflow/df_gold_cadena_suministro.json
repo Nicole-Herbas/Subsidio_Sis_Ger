@@ -161,6 +161,9 @@
 				},
 				{
 					"name": "union1"
+				},
+				{
+					"name": "filter1"
 				}
 			],
 			"scriptLines": [
@@ -424,10 +427,10 @@
 				"          tipo_movimiento,",
 				"          fecha_sk,",
 				"          almacen_sk,",
-				"          vehiculo_sk,",
-				"          centro_destino,",
-				"          cantidad_movida,",
 				"          transportista_sk = TransportistaGold@transportista_sk,",
+				"          vehiculo_sk,",
+				"          cantidad_movida,",
+				"          centro_destino,",
 				"          estado = AgenciaDespacho@estado",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
@@ -441,7 +444,7 @@
 				"          estado = 'Entregado',",
 				"          ci_beneficiaria = ci,",
 				"          paquete_sk = paquete_sk) ~> derivedColumn4",
-				"lookup10, PaqueteGold lookup(SupEntrega@paquete_id == PaqueteGold@paquete_id,",
+				"filter1, PaqueteGold lookup(SupEntrega@paquete_id == PaqueteGold@paquete_id,",
 				"     multiple: false,",
 				"     pickup: 'any',",
 				"     broadcast: 'auto')~> lookup11",
@@ -458,6 +461,7 @@
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> select4",
 				"select1, select2, select3, select4 union(byName: true)~> union1",
+				"lookup10 filter(!isNull(persona_sk)) ~> filter1",
 				"union1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
