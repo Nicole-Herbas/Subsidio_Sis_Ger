@@ -7,7 +7,7 @@
 				"type": "ExecuteDataFlow",
 				"dependsOn": [
 					{
-						"activity": "Script1",
+						"activity": "ScriptLimpiar",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -34,7 +34,7 @@
 				}
 			},
 			{
-				"name": "Script1",
+				"name": "ScriptLimpiar",
 				"type": "Script",
 				"dependsOn": [],
 				"policy": {
@@ -64,7 +64,7 @@
 				"type": "ExecuteDataFlow",
 				"dependsOn": [
 					{
-						"activity": "df_persona",
+						"activity": "ScriptCompletar",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -305,6 +305,39 @@
 						"computeType": "General"
 					},
 					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "ScriptCompletar",
+				"type": "Script",
+				"dependsOn": [
+					{
+						"activity": "df_persona",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "db_subsidio",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "NonQuery",
+							"text": "INSERT INTO gold.dim_persona (ci, nombres)\nSELECT DISTINCT faltantes.ci_huerfano, 'Sin datos SEGIP'\nFROM (\n    SELECT ci_beneficiaria AS ci_huerfano FROM silver.bja_inscripciones\n    UNION\n    SELECT ci_beneficiaria FROM silver.bja_controles_prenatales\n    UNION\n    SELECT ci_madre        FROM silver.bja_partos\n    UNION\n    SELECT ci_recien_nacido FROM silver.bja_partos WHERE ci_recien_nacido IS NOT NULL\n    UNION\n    SELECT ci_beneficiaria FROM silver.bja_pagos\n    UNION\n    SELECT ci_nino         FROM silver.bja_controles_pediatricos\n    UNION\n    SELECT ci_madre        FROM silver.bja_controles_pediatricos\n    UNION\n    SELECT ci_beneficiaria FROM silver.sup_inscripciones\n    UNION\n    SELECT ci_beneficiaria FROM silver.sup_controles\n    UNION\n    SELECT ci_beneficiaria FROM silver.sup_boletas\n    UNION\n    SELECT ci_beneficiaria FROM silver.sup_entregas\n) AS faltantes\nWHERE faltantes.ci_huerfano IS NOT NULL\n  AND faltantes.ci_huerfano NOT IN (SELECT ci FROM gold.dim_persona);"
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
 				}
 			}
 		],
