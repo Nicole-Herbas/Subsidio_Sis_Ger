@@ -62,6 +62,34 @@
 						"type": "DatasetReference"
 					},
 					"name": "SupInscripcion"
+				},
+				{
+					"dataset": {
+						"referenceName": "silver_sup_controles",
+						"type": "DatasetReference"
+					},
+					"name": "SupControlPrenatal"
+				},
+				{
+					"dataset": {
+						"referenceName": "silver_sup_boletas",
+						"type": "DatasetReference"
+					},
+					"name": "SupBoleta"
+				},
+				{
+					"dataset": {
+						"referenceName": "silver_sup_entregas",
+						"type": "DatasetReference"
+					},
+					"name": "SupEntrega"
+				},
+				{
+					"dataset": {
+						"referenceName": "gold_dim_paquete",
+						"type": "DatasetReference"
+					},
+					"name": "PaqueteGold"
 				}
 			],
 			"sinks": [],
@@ -134,6 +162,42 @@
 				},
 				{
 					"name": "select6"
+				},
+				{
+					"name": "lookup12"
+				},
+				{
+					"name": "lookup13"
+				},
+				{
+					"name": "derivedColumn7"
+				},
+				{
+					"name": "select7"
+				},
+				{
+					"name": "lookup14"
+				},
+				{
+					"name": "derivedColumn8"
+				},
+				{
+					"name": "select8"
+				},
+				{
+					"name": "lookup15"
+				},
+				{
+					"name": "lookup16"
+				},
+				{
+					"name": "lookup17"
+				},
+				{
+					"name": "derivedColumn9"
+				},
+				{
+					"name": "select9"
 				}
 			],
 			"scriptLines": [
@@ -262,6 +326,61 @@
 				"     isolationLevel: 'READ_UNCOMMITTED',",
 				"     query: 'SELECT inscripcion_id, ci_beneficiaria, establecimiento_id,\\r\\n       fecha_inscripcion, semana_gestacion, estado\\r\\nFROM silver.sup_inscripciones\\r\\nWHERE fecha_inscripcion IS NOT NULL',",
 				"     format: 'query') ~> SupInscripcion",
+				"source(output(",
+				"          control_id as integer,",
+				"          ci_beneficiaria as string,",
+				"          establecimiento_id as integer,",
+				"          nro_control as integer,",
+				"          fecha_control as date,",
+				"          semana_gestacion as integer,",
+				"          presion_sistolica as short,",
+				"          presion_diastolica as short",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'SELECT control_id, ci_beneficiaria, establecimiento_id,\\r\\n       nro_control, fecha_control, semana_gestacion,\\r\\n       presion_sistolica, presion_diastolica\\r\\nFROM silver.sup_controles\\r\\nWHERE fecha_control IS NOT NULL',",
+				"     format: 'query') ~> SupControlPrenatal",
+				"source(output(",
+				"          boleta_id as integer,",
+				"          control_id as integer,",
+				"          ci_beneficiaria as string,",
+				"          nro_boleta as string,",
+				"          fecha_emision as date,",
+				"          estado as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'SELECT boleta_id, control_id, ci_beneficiaria, nro_boleta, fecha_emision, estado\\nFROM silver.sup_boletas\\nWHERE fecha_emision IS NOT NULL',",
+				"     format: 'query') ~> SupBoleta",
+				"source(output(",
+				"          entrega_id as integer,",
+				"          boleta_id as integer,",
+				"          ci_beneficiaria as string,",
+				"          establecimiento_id as integer,",
+				"          paquete_id as integer,",
+				"          fecha_entrega as date,",
+				"          peso_paquete_kg as decimal(6,2)",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'SELECT entrega_id, boleta_id, ci_beneficiaria, establecimiento_id,\\n       paquete_id, fecha_entrega, peso_paquete_kg\\nFROM silver.sup_entregas\\nWHERE fecha_entrega IS NOT NULL',",
+				"     format: 'query') ~> SupEntrega",
+				"source(output(",
+				"          paquete_sk as integer,",
+				"          paquete_id as integer,",
+				"          nombre as string,",
+				"          contenido as string,",
+				"          tipo_paquete as string,",
+				"          peso_estandar_kg as decimal(6,2),",
+				"          costo_estimado_bs as decimal(10,2)",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> PaqueteGold",
 				"BjaInscripcion, personaGold lookup(ci_beneficiaria == ci,",
 				"     multiple: false,",
 				"     pickup: 'any',",
@@ -426,7 +545,91 @@
 				"          estado = SupInscripcion@estado",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> select6"
+				"     skipDuplicateMapOutputs: true) ~> select6",
+				"SupControlPrenatal, personaGold lookup(ci_beneficiaria == ci,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup12",
+				"lookup12, EstablecimientoGold lookup(SupControlPrenatal@establecimiento_id == EstablecimientoGold@establecimiento_id,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup13",
+				"lookup13 derive(fecha_sk = toInteger(toString(fecha_control, 'yyyyMMdd')),",
+				"          {sistema_origen } = 'SUP',",
+				"          {tipo_actividad } = 'Control Prenatal') ~> derivedColumn7",
+				"derivedColumn7 select(mapColumn(",
+				"          persona_sk,",
+				"          ci,",
+				"          nombres,",
+				"          apellido_paterno,",
+				"          municipio_residencia,",
+				"          genero,",
+				"          fecha_sk,",
+				"          {sistema_origen },",
+				"          {tipo_actividad },",
+				"          establecimiento_sk,",
+				"          semana_gestacion,",
+				"          nro_control,",
+				"          presion_sistolica,",
+				"          presion_diastolica",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select7",
+				"SupBoleta, personaGold lookup(ci_beneficiaria == ci,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup14",
+				"lookup14 derive({fecha_sk } = toInteger(toString(fecha_emision, 'yyyyMMdd')),",
+				"          {sistema_origen } = 'SUP',",
+				"          tipo_actividad = 'Boleta Emitida') ~> derivedColumn8",
+				"derivedColumn8 select(mapColumn(",
+				"          persona_sk,",
+				"          ci,",
+				"          nombres,",
+				"          apellido_paterno,",
+				"          municipio_residencia,",
+				"          genero,",
+				"          {fecha_sk },",
+				"          {sistema_origen },",
+				"          tipo_actividad,",
+				"          estado",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select8",
+				"SupEntrega, personaGold lookup(ci_beneficiaria == ci,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup15",
+				"lookup15, EstablecimientoGold lookup(SupEntrega@establecimiento_id == EstablecimientoGold@establecimiento_id,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup16",
+				"lookup16, PaqueteGold lookup(SupEntrega@paquete_id == PaqueteGold@paquete_id,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup17",
+				"lookup17 derive(fecha_sk = toInteger(toString(fecha_entrega, 'yyyyMMdd')),",
+				"          {sistema_origen } = 'SUP',",
+				"          tipo_actividad = 'Entrega Paquete',",
+				"          costo_paquete_bs = costo_estimado_bs) ~> derivedColumn9",
+				"derivedColumn9 select(mapColumn(",
+				"          persona_sk,",
+				"          ci,",
+				"          nombres,",
+				"          apellido_paterno,",
+				"          municipio_residencia,",
+				"          genero,",
+				"          fecha_sk,",
+				"          {sistema_origen },",
+				"          tipo_actividad,",
+				"          establecimiento_sk,",
+				"          paquete_sk,",
+				"          tipo_paquete,",
+				"          peso_paquete_kg,",
+				"          costo_paquete_bs",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select9"
 			]
 		}
 	}
